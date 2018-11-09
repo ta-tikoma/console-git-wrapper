@@ -7,14 +7,14 @@ FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET BRANCH=%%I
 ECHO Branch: !BRANCH! Path: %cd%
 ECHO Help:
 ECHO s   - show status
-ECHO c   - commit all chaned files
+ECHO c   - commit all changed files
 ECHO p   - push to current branch
 ECHO pl  - pull form current branch
 ECHO f   - fetch
 ECHO b   - branch list (and update current branch)
-ECHO bc  - change branch 
-ECHO bnm - new branch from master
-ECHO bnd - new branch from develop
+ECHO cb  - change branch 
+ECHO nbm - new branch from master
+ECHO nbd - new branch from develop
 ECHO l   - history of commits
 ECHO cf  - checkout file
 ECHO r   - reset branch
@@ -71,12 +71,12 @@ IF "%COMMAND%" == "r" (
     ECHO Reset:
     git reset --hard HEAD
 )
-IF "%COMMAND%" == "bnm" (
+IF "%COMMAND%" == "nbm" (
     ECHO New branch from master:
     SET /p BRANCH=Branch name? 
     git checkout -b !BRANCH! master
 )
-IF "%COMMAND%" == "bnd" (
+IF "%COMMAND%" == "nbd" (
     ECHO New branch from develop:
     SET /p BRANCH=Branch name? 
     git checkout -b !BRANCH! develop
@@ -99,7 +99,7 @@ IF "%COMMAND%" == "cf" (
         SET /A INDEX=INDEX+1
     )
 )
-IF "%COMMAND%" == "bc" (
+IF "%COMMAND%" == "cb" (
     ECHO Select branch:
     SET /A INDEX=1
     FOR /f "delims=" %%B in ('git branch') do (
