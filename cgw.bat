@@ -3,6 +3,8 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 set LC_ALL=C.UTF-8
 
 :help
+FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET BRANCH=%%I
+ECHO Branch: !BRANCH! Path: %cd%
 ECHO Help:
 ECHO s   - show status
 ECHO c   - commit all chaned files
@@ -21,10 +23,10 @@ ECHO e   - exit
 
 
 :loop
-FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET BRANCH=%%I
 SET /p COMMAND=What you want? 
 CLS
-ECHO Branch: !BRANCH!
+FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET BRANCH=%%I
+ECHO Branch: !BRANCH! Path: %cd%
 IF "%COMMAND%" == "s" (
     ECHO Status:
     git status -s
@@ -36,8 +38,10 @@ IF "%COMMAND%" == "c" (
         SET GITCOMMAND=add
         IF "!TYPE:~0,2!" == " D" (
             SET GITCOMMAND="rm"
+            ECHO RM:  !TYPE!
+        ) ELSE (
+            ECHO ADD: !TYPE!
         )
-        ECHO ADD: !TYPE!
         git !GITCOMMAND! !TYPE:~3!
     )
     SET /p COMMIT=Commit text? 
