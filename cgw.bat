@@ -15,7 +15,7 @@ ECHO b   - branch list (and update current branch)
 ECHO cb  - change branch 
 ECHO nbm - new branch from master
 ECHO nbd - new branch from develop
-ECHO l   - history of commits
+ECHO l   - log of commits
 ECHO cf  - checkout file
 ECHO r   - reset branch
 ECHO h   - help
