@@ -8,7 +8,7 @@ Symple console git client wrapper. It script for wrap git commands and quickly e
 4. Run command `cgw`.
 
 # Commands
-Press
+Press  
 s   - show `s`tatus  
 c   - `c`ommit all changed files  
 p   - `p`ush to current branch  
