@@ -12,13 +12,14 @@ Press
 s   - show `s`tatus  
 c   - `c`ommit all changed files  
 p   - `p`ush to current branch  
+cp  - `c`ommit all changed files and `p`ush to current branch  
 pl  - `p`u`l`l form current branch  
 f   - `f`etch  
 b   - `b`ranch list (and update current branch)  
 cb  - `c`hange `b`ranch   
 nbm - `n`ew `b`ranch from `m`aster  
 nbd - `n`ew `b`ranch from `d`evelop  
-l   - history of commits  
+l   - `l`og of commits  
 cf  - `c`heckout `f`ile  
 r   - hard `r`eset branch  
 h   - `h`elp  

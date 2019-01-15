@@ -9,6 +9,7 @@ ECHO Help:
 ECHO s   - show status
 ECHO c   - commit all changed files
 ECHO p   - push to current branch
+ECHO сp  - commit all changed fales and push to current branch
 ECHO pl  - pull form current branch
 ECHO f   - fetch
 ECHO b   - branch list (and update current branch)
@@ -46,6 +47,24 @@ IF "%COMMAND%" == "c" (
     )
     SET /p COMMIT=Commit text? 
     git commit -m "!COMMIT!"
+)
+IF "%COMMAND%" == "cp" (
+    ECHO Files add to commit:
+    FOR /f "delims=" %%L in ('git status -s') do (
+        SET TYPE=%%L
+        SET GITCOMMAND=add
+        IF "!TYPE:~0,2!" == " D" (
+            SET GITCOMMAND="rm"
+            ECHO RM:  !TYPE!
+        ) ELSE (
+            ECHO ADD: !TYPE!
+        )
+        git !GITCOMMAND! !TYPE:~3!
+    )
+    SET /p COMMIT=Commit text? 
+    git commit -m "!COMMIT!"
+    ECHO Push:
+    git push origin !BRANCH!
 )
 IF "%COMMAND%" == "p" (
     ECHO Push:
