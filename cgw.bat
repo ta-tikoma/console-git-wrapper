@@ -1,6 +1,8 @@
 @echo off
 SETLOCAL ENABLEDELAYEDEXPANSION
 set LC_ALL=C.UTF-8
+SET SCRIPT_PATH=%~dp0
+SET "PROJECTS_PATH=%SCRIPT_PATH%projects.txt"
 
 :help
 FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET BRANCH=%%I
@@ -9,7 +11,7 @@ ECHO Help:
 ECHO s   - show status
 ECHO c   - commit all changed files
 ECHO p   - push to current branch
-ECHO сp  - commit all changed fales and push to current branch
+ECHO cp  - commit all changed fales and push to current branch
 ECHO pl  - pull form current branch
 ECHO f   - fetch
 ECHO b   - branch list (and update current branch)
@@ -19,6 +21,8 @@ ECHO nbd - new branch from develop
 ECHO l   - log of commits
 ECHO cf  - checkout file
 ECHO r   - reset branch
+ECHO sp  - select project
+ECHO ap  - add project
 ECHO h   - help
 ECHO e   - exit
 
@@ -135,7 +139,30 @@ IF "%COMMAND%" == "cb" (
         )
         SET /A INDEX=INDEX+1
     )
-
+)
+IF "%COMMAND%" == "sp" (
+    SET /A INDEX=1
+    FOR /f "delims=" %%B in ('type "!PROJECTS_PATH!"') do (
+        ECHO !INDEX! %%B
+        SET /A INDEX=INDEX+1
+    )
+    SET /p PROJECTNUMBER=Project number? 
+    SET /A INDEX=1
+    FOR /f "delims=" %%B in ('type "!PROJECTS_PATH!"') do (
+        IF !INDEX! == !PROJECTNUMBER! (
+            SET PROJECT=%%B
+            CD !PROJECT!
+            ECHO Change to: !PROJECT!
+            GOTO loop
+        )
+        SET /A INDEX=INDEX+1
+    )
+    GOTO loop
+)
+IF "%COMMAND%" == "ap" (
+    ECHO %cd% >> !PROJECTS_PATH!
+    ECHO Project '%cd%' add.
+    GOTO loop
 )
 IF "%COMMAND%" == "h" (
     GOTO help
