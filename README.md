@@ -20,7 +20,7 @@ b   - `b`ranch list (and update current branch)
 cb  - `c`hange `b`ranch   
 nbm - `n`ew `b`ranch from `m`aster  
 nbd - `n`ew `b`ranch from `d`evelop  
-l   - `l`og of commits  
+mtm - `m`erge current branch `t`o `m`aster
 cf  - `c`heckout `f`ile  
 r   - hard `r`eset branch  
   
