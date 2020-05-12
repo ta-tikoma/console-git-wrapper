@@ -7,12 +7,9 @@ exit /b
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 set LC_ALL=C.UTF-8
-SET SCRIPT_PATH=%~dp0
-SET "PROJECTS_PATH=%SCRIPT_PATH%projects.txt"
 
 :help
 FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET CURRENT_BRANCH=%%I
-ECHO Branch: !CURRENT_BRANCH! Path: %cd%
 ECHO Help:
 ECHO s   - show status
 ECHO c   - commit all changed files
@@ -20,17 +17,20 @@ ECHO p   - push to current branch
 ECHO cp  - commit all changed fales and push to current branch
 ECHO pl  - pull form current branch
 ECHO f   - fetch
+ECHO ------------------------
+ECHO m   - merge in current branch
 ECHO b   - branch list (and update current branch)
 ECHO cb  - change branch 
 ECHO rb  - remove branch 
-ECHO nbm - new branch from master
-ECHO nbd - new branch from develop
-ECHO mtm - merge current branch to master
+ECHO nb  - new branch from current branch
+ECHO ------------------------
+ECHO t   - tag list
+ECHO ft  - fetch tag
+ECHO dt  - delete tag
+ECHO at  - add tag
+ECHO ------------------------
 ECHO cf  - checkout file
 ECHO r   - reset branch
-ECHO ------------------------
-ECHO sp  - select project
-ECHO ap  - add project
 ECHO ------------------------
 ECHO h   - help
 ECHO e   - exit
@@ -38,9 +38,10 @@ ECHO e   - exit
 
 :loop
 SET /p COMMAND=What you want? 
-CLS
 FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET CURRENT_BRANCH=%%I
+CLS
 ECHO Branch: !CURRENT_BRANCH! Path: %cd%
+
 IF "%COMMAND%" == "s" (
     ECHO Status:
     git status -s
@@ -99,18 +100,27 @@ IF "%COMMAND%" == "r" (
     ECHO Reset:
     git reset --hard HEAD
 )
-IF "%COMMAND%" == "nbm" (
-    ECHO New branch from master:
-    SET /p BRANCH=Branch name? 
-    git checkout -b !BRANCH! master
+IF "%COMMAND%" == "t" (
+    ECHO Tag list:
+    git tag --sort=-creatordate
 )
-IF "%COMMAND%" == "nbd" (
-    ECHO New branch from develop:
+IF "%COMMAND%" == "ft" (
+    ECHO Fetch tag:
+    git fetch --tags --force
+)
+IF "%COMMAND%" == "nb" (
+    ECHO New branch from current branch:
     SET /p BRANCH=Branch name? 
-    git checkout -b !BRANCH! develop
+    git checkout -b !BRANCH! !CURRENT_BRANCH!
+)
+IF "%COMMAND%" == "at" (
+    ECHO Add tag on last commit:
+    SET /p TAG=Tag name? 
+    git tag !TAG!
+    git push origin !TAG!
 )
 IF "%COMMAND%" == "cf" (
-    ECHO Select file:
+    ECHO Select file for checkout:
     SET /A INDEX=1
     FOR /f "delims=" %%B in ('git status -s') do (
         ECHO !INDEX! %%B
@@ -127,19 +137,29 @@ IF "%COMMAND%" == "cf" (
         SET /A INDEX=INDEX+1
     )
 )
-IF "%COMMAND%" == "mtm" (
-    git checkout master
-    git pull origin master
-    git merge --no-ff !CURRENT_BRANCH!
-    git push origin master
-    ECHO merged!
-    GOTO loop
-)
-IF "%COMMAND%" == "cb" (
-    ECHO Select branch:
+IF "%COMMAND%" == "m" (
+    ECHO Select branch for merge in current:
     SET /A INDEX=1
     FOR /f "delims=" %%B in ('git branch') do (
-        ECHO !INDEX! %%B
+        ECHO %%B -[!INDEX!]
+        SET /A INDEX=INDEX+1
+    )
+    SET /p BRANCHNUMBER=Branch number? 
+    SET /A INDEX=1
+    FOR /f "delims=" %%B in ('git branch') do (
+        IF !INDEX! == !BRANCHNUMBER! (
+            SET BRANCH=%%B
+            git merge --no-ff !BRANCH:~2!
+            GOTO loop
+        )
+        SET /A INDEX=INDEX+1
+    )
+)
+IF "%COMMAND%" == "cb" (
+    ECHO Select branch for checkout:
+    SET /A INDEX=1
+    FOR /f "delims=" %%B in ('git branch') do (
+        ECHO %%B -[!INDEX!]
         SET /A INDEX=INDEX+1
     )
     SET /p BRANCHNUMBER=Branch number? 
@@ -154,10 +174,10 @@ IF "%COMMAND%" == "cb" (
     )
 )
 IF "%COMMAND%" == "rb" (
-    ECHO Select branch:
+    ECHO Select branch for remove:
     SET /A INDEX=1
     FOR /f "delims=" %%B in ('git branch') do (
-        ECHO !INDEX! %%B
+        ECHO %%B -[!INDEX!]
         SET /A INDEX=INDEX+1
     )
     SET /p BRANCHNUMBER=Branch number? 
@@ -171,29 +191,24 @@ IF "%COMMAND%" == "rb" (
         SET /A INDEX=INDEX+1
     )
 )
-IF "%COMMAND%" == "sp" (
+IF "%COMMAND%" == "dt" (
+    ECHO Select tag for delete:
     SET /A INDEX=1
-    FOR /f "delims=" %%B in ('type "!PROJECTS_PATH!"') do (
-        ECHO !INDEX! %%B
+    FOR /f "delims=" %%B in ('git tag --sort=-creatordate') do (
+        ECHO %%B -[!INDEX!]
         SET /A INDEX=INDEX+1
     )
-    SET /p PROJECTNUMBER=Project number? 
+    SET /p TAGNUMBER=Tag number? 
     SET /A INDEX=1
-    FOR /f "delims=" %%B in ('type "!PROJECTS_PATH!"') do (
-        IF !INDEX! == !PROJECTNUMBER! (
-            SET PROJECT=%%B
-            CD !PROJECT!
-            ECHO Change to: !PROJECT!
+    FOR /f "delims=" %%B in ('git tag --sort=-creatordate') do (
+        IF !INDEX! == !TAGNUMBER! (
+            SET TAG=%%B
+            git tag -d !TAG!
+            git push --delete origin !TAG!
             GOTO loop
         )
         SET /A INDEX=INDEX+1
     )
-    GOTO loop
-)
-IF "%COMMAND%" == "ap" (
-    ECHO %cd% >> !PROJECTS_PATH!
-    ECHO Project '%cd%' add.
-    GOTO loop
 )
 IF "%COMMAND%" == "h" (
     GOTO help
