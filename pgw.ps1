@@ -1,14 +1,16 @@
 ﻿$continue = $true;
 do {
-    $branch = git rev-parse --abbrev-ref HEAD
+    $currentBranch = git rev-parse --abbrev-ref HEAD
     $path = Get-Location
     Write-Host "Branch: '$branch' Path: '$path'"
     $command = Read-Host -Prompt 'What you want'
     Switch ($command) {
         's' {
+            Write-Host "GIT STATUS" -ForegroundColor Green
             git status -s
         }
         'c' {
+            Write-Host "GIT COMMIT ALL FILES" -ForegroundColor Green
             $status = git status -s
             $status.Split([Environment]::NewLine) | ForEach-Object -Process {
                 $gitAction = 'add'
@@ -25,27 +27,40 @@ do {
             git commit -m $commit
         }
         'p' {
-            git push origin $branch
+            Write-Host "GIT PUSH" -ForegroundColor Green
+            git push origin $currentBranch
         }
         'cp' {
         }
         'pl' {
+            Write-Host "GIT PULL" -ForegroundColor Green
+            git pull origin $currentBranch
         }
         'f' {
+            Write-Host "GIT FETCH" -ForegroundColor Green
+            git fetch
         }
         'm' {
         }
         'b' {
+            Write-Host "BRANCHES" -ForegroundColor Green
+            git branch
         }
         'cb' {
         }
         'rb' {
         }
         'nb' {
+            Write-Host "CHANGE BRANCH" -ForegroundColor Green
+            $branch = Read-Host -Prompt 'Branch name'
+            git checkout -b $branch $currentBranch
         }
         't' {
+            Write-Host "TAGS" -ForegroundColor Green
+            git tag --sort=-creatordate
         }
         'ft' {
+            git fetch --tags --force
         }
         'dt' {
         }
@@ -54,9 +69,12 @@ do {
         'cf' {
         }
         'r' {
+            Write-Host "RESET" -ForegroundColor Green
+            git reset --hard HEAD
         }
         'h' {
-            Write-Host “Help:
+            Write-Host "HELP" -ForegroundColor Green
+            Write-Host “
     s   - show status
     c   - commit all changed files
     p   - push to current branch
