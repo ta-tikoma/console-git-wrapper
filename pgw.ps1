@@ -1,4 +1,27 @@
-﻿$continue = $true;
+﻿Function Git-Commit {
+    Write-Host "GIT COMMIT ALL FILES" -ForegroundColor Green
+    $status = git status -s
+    $status.Split([Environment]::NewLine) | ForEach-Object -Process {
+        $gitAction = 'add'
+        $file = $_.Substring(3)
+        if ($_.Substring(0, 2) -eq ' D') {
+            Write-Host "RM  $file"
+            $gitAction = 'rm'
+        } else {
+            Write-Host "ADD $file"
+        }
+        git $gitAction $_.Substring(3)
+    }
+    $commit = Read-Host -Prompt 'Commit text'
+    git commit -m $commit
+}
+
+Function Git-Push {
+    Write-Host "GIT PUSH" -ForegroundColor Green
+    git push origin $currentBranch 2>&1 | %{ "$_" } 
+}
+
+$continue = $true;
 do {
     $currentBranch = git rev-parse --abbrev-ref HEAD
     $path = Get-Location
@@ -10,31 +33,18 @@ do {
             git status -s
         }
         'c' {
-            Write-Host "GIT COMMIT ALL FILES" -ForegroundColor Green
-            $status = git status -s
-            $status.Split([Environment]::NewLine) | ForEach-Object -Process {
-                $gitAction = 'add'
-                $file = $_.Substring(3)
-                if ($_.Substring(0, 2) -eq ' D') {
-                    Write-Host "RM  $file"
-                    $gitAction = 'rm'
-                } else {
-                    Write-Host "ADD $file"
-                }
-                git $gitAction $_.Substring(3)
-            }
-            $commit = Read-Host -Prompt 'Commit text'
-            git commit -m $commit
+            Git-Commit
         }
         'p' {
-            Write-Host "GIT PUSH" -ForegroundColor Green
-            git push origin $currentBranch
+            Git-Push
         }
         'cp' {
+            Git-Commit
+            Git-Push
         }
         'pl' {
             Write-Host "GIT PULL" -ForegroundColor Green
-            git pull origin $currentBranch
+            git pull origin $currentBranch 2>&1 | %{ "$_" }
         }
         'f' {
             Write-Host "GIT FETCH" -ForegroundColor Green
