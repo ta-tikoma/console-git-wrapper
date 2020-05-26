@@ -1,4 +1,7 @@
-﻿Function Git-Commit {
+﻿. include\show-list.ps1
+. include\select-from-list.ps1
+
+Function Git-Commit {
     Write-Host "GIT COMMIT ALL FILES" -ForegroundColor Green
     $status = git status -s
     $status.Split([Environment]::NewLine) | ForEach-Object -Process {
@@ -25,12 +28,12 @@ $continue = $true;
 do {
     $currentBranch = git rev-parse --abbrev-ref HEAD
     $path = Get-Location
-    Write-Host "Branch: '$branch' Path: '$path'"
+    Write-Host "Branch: '$currentBranch' Path: '$path'"
     $command = Read-Host -Prompt 'What you want'
     Switch ($command) {
         's' {
-            Write-Host "GIT STATUS" -ForegroundColor Green
-            git status -s
+            $status = git status -s
+            Show-List "GIT STATUS" $status.Split([Environment]::NewLine)        
         }
         'c' {
             Git-Commit
@@ -53,28 +56,33 @@ do {
         'm' {
         }
         'b' {
-            Write-Host "BRANCHES" -ForegroundColor Green
-            git branch
+            $branches = git branch
+            Show-List "BRANCHES" $branches.Split([Environment]::NewLine)
         }
         'cb' {
         }
         'rb' {
         }
         'nb' {
-            Write-Host "CHANGE BRANCH" -ForegroundColor Green
+            Write-Host "NEW BRANCH" -ForegroundColor Green
             $branch = Read-Host -Prompt 'Branch name'
-            git checkout -b $branch $currentBranch
+            git checkout -b $branch 2>&1 | %{ "$_" }
         }
         't' {
-            Write-Host "TAGS" -ForegroundColor Green
-            git tag --sort=-creatordate
+            $tags = git tag --sort=-creatordate
+            Show-List "TAGS" $tags.Split([Environment]::NewLine)
         }
         'ft' {
+            Write-Host "FETCH TAGS" -ForegroundColor Green
             git fetch --tags --force
         }
         'dt' {
         }
         'at' {
+            Write-Host "ADD TAG" -ForegroundColor Green
+            $tag = Read-Host -Prompt 'Tag name'
+            git tag $tag
+            git push origin $tag
         }
         'cf' {
         }
@@ -84,33 +92,32 @@ do {
         }
         'h' {
             Write-Host "HELP" -ForegroundColor Green
-            Write-Host “
-    s   - show status
-    c   - commit all changed files
-    p   - push to current branch
-    cp  - commit all changed fales and push to current branch
-    pl  - pull form current branch
-    f   - fetch
-    ------------------------
-    m   - merge in current branch
-    b   - branch list (and update current branch)
-    cb  - change branch
-    rb  - remove branch
-    nb  - new branch from current branch
-    ------------------------
-    t   - tag list
-    ft  - fetch tag
-    dt  - delete tag
-    at  - add tag
-    ------------------------
-    cf  - checkout file
-    r   - reset branch
-    ------------------------
-    h   - help
-    e   - exit“
+            Write-Host “s   - show status
+c   - commit all changed files
+p   - push to current branch
+cp  - commit all changed fales and push to current branch
+pl  - pull form current branch
+f   - fetch
+------------------------
+m   - merge in current branch
+b   - branch list (and update current branch)
+cb  - change branch
+rb  - remove branch
+nb  - new branch from current branch
+------------------------
+t   - tag list
+ft  - fetch tag
+dt  - delete tag
+at  - add tag
+------------------------
+cf  - checkout file
+r   - reset branch
+------------------------
+h   - help
+q   - quit“
 
         }
-        'e' {
+        'q' {
             $continue = $false
         }
     }
