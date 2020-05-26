@@ -60,6 +60,8 @@ do {
             Show-List "BRANCHES" $branches.Split([Environment]::NewLine)
         }
         'cb' {
+            $branches = git branch
+            Select-From-List "SELECT BRANCH" $branches.Split([Environment]::NewLine)
         }
         'rb' {
         }

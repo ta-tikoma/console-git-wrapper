@@ -4,8 +4,8 @@ Function Show-List($title, $lines) {
     do {    
         $selectedLines = $lines[$offset..10]
         Write-Host $title -ForegroundColor Green
-        $selectedLines | ForEach-Object -Process {
-            Write-Host $_
+        foreach ($line in $selectedLines) {
+            Write-Host $line
         }
         Write-Host "______________________________
 j - down, k - up, q - quit"
