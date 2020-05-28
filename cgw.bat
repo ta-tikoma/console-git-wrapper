@@ -6,45 +6,22 @@ exit /b
 :cgw
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-set LC_ALL=C.UTF-8
+SET LC_ALL=C.UTF-8
 
-:help
-FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET CURRENT_BRANCH=%%I
-ECHO Help:
-ECHO s   - show status
-ECHO c   - commit all changed files
-ECHO p   - push to current branch
-ECHO cp  - commit all changed fales and push to current branch
-ECHO pl  - pull form current branch
-ECHO f   - fetch
-ECHO ------------------------
-ECHO m   - merge in current branch
-ECHO b   - branch list (and update current branch)
-ECHO cb  - change branch 
-ECHO rb  - remove branch 
-ECHO nb  - new branch from current branch
-ECHO ------------------------
-ECHO t   - tag list
-ECHO ft  - fetch tag
-ECHO dt  - delete tag
-ECHO at  - add tag
-ECHO ------------------------
-ECHO cf  - checkout file
-ECHO r   - reset branch
-ECHO ------------------------
-ECHO h   - help
-ECHO e   - exit
-
+REM define buffer file
+SET "buff=%tmp%\cgw~%RANDOM%.tmp"
 
 :loop
-SET /p COMMAND=What you want? 
 FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET CURRENT_BRANCH=%%I
-CLS
+ECHO _______________________________________________________________
 ECHO Branch: !CURRENT_BRANCH! Path: %cd%
+SET /p COMMAND=What you want? 
+CLS
 
 IF "%COMMAND%" == "s" (
     ECHO Status:
-    git status -s
+    git status -s > "%buff%"
+    CALL :ShowList
 )
 IF "%COMMAND%" == "c" (
     ECHO Files add to commit:
@@ -120,21 +97,10 @@ IF "%COMMAND%" == "at" (
     git push origin !TAG!
 )
 IF "%COMMAND%" == "cf" (
-    ECHO Select file for checkout:
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git status -s') do (
-        ECHO !INDEX! %%B
-        SET /A INDEX=INDEX+1
-    )
-    SET /p FILENUMBER=Checkout file number? 
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git status -s') do (
-        IF !INDEX! == !FILENUMBER! (
-            SET FILE=%%B
-            git checkout !FILE:~3!
-            GOTO loop
-        )
-        SET /A INDEX=INDEX+1
+    git status -s > "%buff%"
+    CALL :SelectOneFromList "Select file for checkout"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git checkout !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "m" (
@@ -211,6 +177,131 @@ IF "%COMMAND%" == "dt" (
     )
 )
 IF "%COMMAND%" == "h" (
-    GOTO help
+    ECHO Help:
+    ECHO s   - show status
+    ECHO c   - commit all changed files
+    ECHO p   - push to current branch
+    ECHO cp  - commit all changed fales and push to current branch
+    ECHO pl  - pull form current branch
+    ECHO f   - fetch
+    ECHO ------------------------
+    ECHO m   - merge in current branch
+    ECHO b   - branch list
+    ECHO cb  - change branch 
+    ECHO rb  - remove branch 
+    ECHO nb  - new branch from current branch
+    ECHO ------------------------
+    ECHO t   - tag list
+    ECHO ft  - fetch tag
+    ECHO dt  - delete tag
+    ECHO at  - add tag
+    ECHO ------------------------
+    ECHO cf  - checkout file
+    ECHO r   - reset branch
+    ECHO ------------------------
+    ECHO h   - help
+    ECHO e   - exit
 )
+
 IF NOT "%COMMAND%" == "e" GOTO loop
+rem EXIT /B %ERRORLEVEL%
+EXIT /B 0
+
+
+rem функция для вывода списка
+:ShowList
+SET /A OFFSET=0
+
+:showListBegin
+CLS
+SET /A INDEX=0
+rem данные читаем из временного файла
+IF !OFFSET! LEQ 0 (
+    SET SK=
+    SET /A OFFSET=0
+) ELSE (
+    SET SK=skip=%OFFSET%
+)
+FOR /f "%SK%delims=" %%B in (%buff%) do (
+    ECHO %%B
+    rem инкрементируем нумерацию
+    SET /A INDEX=INDEX+1
+    rem ограничиваем вывод десятью строками
+    IF !INDEX! == 10 (
+        GOTO :showListEnd
+    )
+)
+:showListEnd
+
+CHOICE /C jke /N /M "j and k for scroll list, e - close"
+IF %ERRORLEVEL% EQU 1 (
+    SET /A OFFSET=OFFSET+1
+    GOTO :showListBegin
+)
+IF %ERRORLEVEL% EQU 2 (
+    SET /A OFFSET=OFFSET-1
+    GOTO :showListBegin
+)
+IF %ERRORLEVEL% EQU 3 (
+    CLS
+    EXIT /B 0
+)
+
+EXIT /B 0
+
+
+rem функция для вывода списка
+:SelectOneFromList
+SET /A OFFSET=0
+SET ONEFORMLIST=
+
+:selectOneFromListBegin
+CLS
+ECHO %~1
+SET /A INDEX=0
+rem данные читаем из временного файла
+IF !OFFSET! LEQ 0 (
+    SET SK=
+    SET /A OFFSET=0
+) ELSE (
+    SET SK=skip=%OFFSET%
+)
+FOR /f "%SK%delims=" %%B in (%buff%) do (
+    rem выводим строки с нумераций
+    ECHO !INDEX! %%B
+    rem инкрементируем нумерацию
+    SET /A INDEX=INDEX+1
+    rem ограничиваем вывод десятью строками
+    IF !INDEX! == 10 (
+        GOTO :selectOneFromListEnd
+    )
+)
+:selectOneFromListEnd
+
+CHOICE /C 0123456789jke /N /M "j and k for scroll list, e - close, 0-9 for make choice"
+rem список вниз
+IF %ERRORLEVEL% EQU 11 (
+    SET /A OFFSET=OFFSET+1
+    GOTO :selectOneFromListBegin
+)
+rem список вверх
+IF %ERRORLEVEL% EQU 12 (
+    SET /A OFFSET=OFFSET-1
+    GOTO :selectOneFromListBegin
+)
+rem выйти из выбора
+IF %ERRORLEVEL% EQU 13 (
+    CLS
+    EXIT /B 0
+)
+rem выбор сделан находим вариант и возвращаем его
+SET /A INDEX = 1
+FOR /f "%SK%delims=" %%B in (%buff%) do (
+    IF !INDEX! == !ERRORLEVEL! (
+        SET ONEFORMLIST=%%B
+    )
+    rem инкрементируем нумерацию
+    SET /A INDEX=INDEX+1
+)
+
+EXIT /B 0
