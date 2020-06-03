@@ -31,7 +31,7 @@ IF "%COMMAND%" == "c" (
             SET GITCOMMAND="rm"
             rem ECHO rm:  !TYPE!
         ) ELSE (
-            ECHO add: !TYPE!
+            ECHO add '!TYPE:~3!'
         )
         git !GITCOMMAND! !TYPE:~3!
     )
@@ -51,7 +51,7 @@ IF "%COMMAND%" == "cp" (
             SET GITCOMMAND="rm"
             rem ECHO rm:  !TYPE!
         ) ELSE (
-            ECHO add: !TYPE!
+            ECHO add '!TYPE:~3!'
         )
         git !GITCOMMAND! !TYPE:~3!
     )
