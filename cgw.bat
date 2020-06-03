@@ -29,7 +29,7 @@ IF "%COMMAND%" == "c" (
         SET GITCOMMAND=add
         IF "!TYPE:~0,2!" == " D" (
             SET GITCOMMAND="rm"
-            ECHO RM:  !TYPE!
+            rem ECHO rm:  !TYPE!
         ) ELSE (
             ECHO ADD: !TYPE!
         )
@@ -49,7 +49,7 @@ IF "%COMMAND%" == "cp" (
         SET GITCOMMAND=add
         IF "!TYPE:~0,2!" == " D" (
             SET GITCOMMAND="rm"
-            ECHO RM:  !TYPE!
+            rem ECHO rm:  !TYPE!
         ) ELSE (
             ECHO ADD: !TYPE!
         )
