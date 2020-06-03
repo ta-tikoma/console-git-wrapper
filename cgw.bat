@@ -19,9 +19,8 @@ SET /p COMMAND=What you want?
 CLS
 
 IF "%COMMAND%" == "s" (
-    ECHO Status:
     git status -s > "%buff%"
-    CALL :ShowList
+    CALL :ShowList "Status:"
 )
 IF "%COMMAND%" == "c" (
     ECHO Files add to commit:
@@ -38,6 +37,10 @@ IF "%COMMAND%" == "c" (
     )
     SET /p COMMIT=Commit text? 
     git commit -m "!COMMIT!"
+)
+IF "%COMMAND%" == "p" (
+    ECHO Push:
+    git push origin !CURRENT_BRANCH!
 )
 IF "%COMMAND%" == "cp" (
     ECHO Files add to commit:
@@ -57,10 +60,6 @@ IF "%COMMAND%" == "cp" (
     ECHO Push:
     git push origin !CURRENT_BRANCH!
 )
-IF "%COMMAND%" == "p" (
-    ECHO Push:
-    git push origin !CURRENT_BRANCH!
-)
 IF "%COMMAND%" == "pl" (
     ECHO Pull:
     git pull origin !CURRENT_BRANCH!
@@ -69,26 +68,56 @@ IF "%COMMAND%" == "f" (
     ECHO Fetch:
     git fetch
 )
+
+rem -----------------------------------------------------
+
+IF "%COMMAND%" == "m" (
+    git status -s > "%buff%"
+    CALL :SelectOneFromList "Select branch for merge in current"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git merge --no-ff !ONEFORMLIST:~2!
+    )
+)
 IF "%COMMAND%" == "b" (
-    ECHO Branch list:
-    git branch
+    git branch > "%buff%"
+    CALL :ShowList "Branches:"
 )
-IF "%COMMAND%" == "r" (
-    ECHO Reset:
-    git reset --hard HEAD
+IF "%COMMAND%" == "cb" (
+    git branch > "%buff%"
+    CALL :SelectOneFromList "Select branch for checkout"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git checkout !ONEFORMLIST:~2!
+    )
 )
-IF "%COMMAND%" == "t" (
-    ECHO Tag list:
-    git tag --sort=-creatordate
+IF "%COMMAND%" == "cb +r" (
+    git branch > "%buff%"
+    CALL :SelectOneFromList "Select branch for checkout"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git checkout !ONEFORMLIST:~2!
+    )
 )
-IF "%COMMAND%" == "ft" (
-    ECHO Fetch tag:
-    git fetch --tags --force
+IF "%COMMAND%" == "rb" (
+    git branch > "%buff%"
+    CALL :SelectOneFromList "Select branch for remove"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git branch -d !ONEFORMLIST:~2!
+    )
 )
 IF "%COMMAND%" == "nb" (
     ECHO New branch from current branch:
     SET /p BRANCH=Branch name? 
     git checkout -b !BRANCH! !CURRENT_BRANCH!
+)
+
+rem -----------------------------------------------------
+
+IF "%COMMAND%" == "t" (
+    git tag --sort=-creatordate > "%buff%"
+    CALL :ShowList "Tags:"
+)
+IF "%COMMAND%" == "ft" (
+    ECHO Fetch tag:
+    git fetch --tags --force
 )
 IF "%COMMAND%" == "at" (
     ECHO Add tag on last commit:
@@ -96,84 +125,26 @@ IF "%COMMAND%" == "at" (
     git tag !TAG!
     git push origin !TAG!
 )
+IF "%COMMAND%" == "dt" (
+    git tag --sort=-creatordate > "%buff%"
+    CALL :SelectOneFromList "Select tag for delete"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git tag -d !ONEFORMLIST!
+        git push --delete origin !ONEFORMLIST!
+    )
+)
+
+rem -----------------------------------------------------
+
+IF "%COMMAND%" == "r" (
+    ECHO Reset:
+    git reset --hard HEAD
+)
 IF "%COMMAND%" == "cf" (
     git status -s > "%buff%"
     CALL :SelectOneFromList "Select file for checkout"
     IF NOT [!ONEFORMLIST!] == [] (
         git checkout !ONEFORMLIST:~2!
-    )
-)
-IF "%COMMAND%" == "m" (
-    ECHO Select branch for merge in current:
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git branch') do (
-        ECHO %%B -[!INDEX!]
-        SET /A INDEX=INDEX+1
-    )
-    SET /p BRANCHNUMBER=Branch number? 
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git branch') do (
-        IF !INDEX! == !BRANCHNUMBER! (
-            SET BRANCH=%%B
-            git merge --no-ff !BRANCH:~2!
-            GOTO loop
-        )
-        SET /A INDEX=INDEX+1
-    )
-)
-IF "%COMMAND%" == "cb" (
-    ECHO Select branch for checkout:
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git branch') do (
-        ECHO %%B -[!INDEX!]
-        SET /A INDEX=INDEX+1
-    )
-    SET /p BRANCHNUMBER=Branch number? 
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git branch') do (
-        IF !INDEX! == !BRANCHNUMBER! (
-            SET BRANCH=%%B
-            git checkout !BRANCH:~2!
-            GOTO loop
-        )
-        SET /A INDEX=INDEX+1
-    )
-)
-IF "%COMMAND%" == "rb" (
-    ECHO Select branch for remove:
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git branch') do (
-        ECHO %%B -[!INDEX!]
-        SET /A INDEX=INDEX+1
-    )
-    SET /p BRANCHNUMBER=Branch number? 
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git branch') do (
-        IF !INDEX! == !BRANCHNUMBER! (
-            SET BRANCH=%%B
-            git branch -d !BRANCH:~2!
-            GOTO loop
-        )
-        SET /A INDEX=INDEX+1
-    )
-)
-IF "%COMMAND%" == "dt" (
-    ECHO Select tag for delete:
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git tag --sort=-creatordate') do (
-        ECHO %%B -[!INDEX!]
-        SET /A INDEX=INDEX+1
-    )
-    SET /p TAGNUMBER=Tag number? 
-    SET /A INDEX=1
-    FOR /f "delims=" %%B in ('git tag --sort=-creatordate') do (
-        IF !INDEX! == !TAGNUMBER! (
-            SET TAG=%%B
-            git tag -d !TAG!
-            git push --delete origin !TAG!
-            GOTO loop
-        )
-        SET /A INDEX=INDEX+1
     )
 )
 IF "%COMMAND%" == "h" (
@@ -214,6 +185,7 @@ SET /A OFFSET=0
 
 :showListBegin
 CLS
+ECHO %~1
 SET /A INDEX=0
 rem данные читаем из временного файла
 IF !OFFSET! LEQ 0 (
