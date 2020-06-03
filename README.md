@@ -1,6 +1,8 @@
 # Console-git-wrapper
 Symple console git client wrapper. It script for wrap git commands and quickly exec him.
 
+![Screenshot](https://github.com/ta-tikoma/console-git-wrapper/raw/master/screenshot.png)
+
 # Install
 1. Clone repository.
 2. Add path to repository folder to PATH.
