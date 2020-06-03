@@ -9,24 +9,30 @@ Symple console git client wrapper. It script for wrap git commands and quickly e
 
 # Commands
   
-git:  
+base:  
 s   - show `s`tatus  
 c   - `c`ommit all changed files  
 p   - `p`ush to current branch  
 cp  - `c`ommit all changed files and `p`ush to current branch  
 pl  - `p`u`l`l form current branch  
 f   - `f`etch  
+
+branch:
+m   - `m`erge selected branch in current
 b   - `b`ranch list (and update current branch)  
 cb  - `c`hange `b`ranch   
-nbm - `n`ew `b`ranch from `m`aster  
-nbd - `n`ew `b`ranch from `d`evelop  
-mtm - `m`erge current branch `t`o `m`aster
+db  - `d`elete `b`ranch
+ab  - `a`dd `b`ranch
+
+tag:
+t   - `t`ag list
+ft  - `f`etch `t`ag
+dt  - `d`elete `t`ag
+at  - `a`dd `t`ag on last commit
+
+other:
 cf  - `c`heckout `f`ile  
 r   - hard `r`eset branch  
-  
-projects:
-sp  - `s`elect `p`roject  
-ap  - `a`dd `p`roject  
   
 program:
 h   - `h`elp  

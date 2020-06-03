@@ -31,7 +31,7 @@ IF "%COMMAND%" == "c" (
             SET GITCOMMAND="rm"
             rem ECHO rm:  !TYPE!
         ) ELSE (
-            ECHO ADD: !TYPE!
+            ECHO add: !TYPE!
         )
         git !GITCOMMAND! !TYPE:~3!
     )
@@ -51,7 +51,7 @@ IF "%COMMAND%" == "cp" (
             SET GITCOMMAND="rm"
             rem ECHO rm:  !TYPE!
         ) ELSE (
-            ECHO ADD: !TYPE!
+            ECHO add: !TYPE!
         )
         git !GITCOMMAND! !TYPE:~3!
     )
@@ -96,15 +96,15 @@ IF "%COMMAND%" == "cb +r" (
         git checkout !ONEFORMLIST:~2!
     )
 )
-IF "%COMMAND%" == "rb" (
+IF "%COMMAND%" == "db" (
     git branch > "%buff%"
-    CALL :SelectOneFromList "Select branch for remove"
+    CALL :SelectOneFromList "Select branch for delete"
     IF NOT [!ONEFORMLIST!] == [] (
         git branch -d !ONEFORMLIST:~2!
     )
 )
-IF "%COMMAND%" == "nb" (
-    ECHO New branch from current branch:
+IF "%COMMAND%" == "ab" (
+    ECHO Add branch from current branch:
     SET /p BRANCH=Branch name? 
     git checkout -b !BRANCH! !CURRENT_BRANCH!
 )
@@ -159,8 +159,8 @@ IF "%COMMAND%" == "h" (
     ECHO m   - merge in current branch
     ECHO b   - branch list
     ECHO cb  - change branch 
-    ECHO rb  - remove branch 
-    ECHO nb  - new branch from current branch
+    ECHO db  - delete branch 
+    ECHO ab  - add branch from current branch
     ECHO ------------------------
     ECHO t   - tag list
     ECHO ft  - fetch tag
