@@ -89,11 +89,11 @@ IF "%COMMAND%" == "cb" (
         git checkout !ONEFORMLIST:~2!
     )
 )
-IF "%COMMAND%" == "cb +r" (
-    git branch > "%buff%"
-    CALL :SelectOneFromList "Select branch for checkout"
+IF "%COMMAND%" == "cb+r" (
+    git branch -r > "%buff%"
+    CALL :SelectOneFromList "Select remote branch for checkout"
     IF NOT [!ONEFORMLIST!] == [] (
-        git checkout !ONEFORMLIST:~2!
+        git checkout -t !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "db" (
