@@ -72,7 +72,7 @@ IF "%COMMAND%" == "f" (
 rem -----------------------------------------------------
 
 IF "%COMMAND%" == "m" (
-    git status -s > "%buff%"
+    git branch > "%buff%"
     CALL :SelectOneFromList "Select branch for merge in current"
     IF NOT [!ONEFORMLIST!] == [] (
         git merge --no-ff !ONEFORMLIST:~2!
