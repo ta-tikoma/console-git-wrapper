@@ -72,18 +72,18 @@ IF "%COMMAND%" == "f" (
 rem -----------------------------------------------------
 
 IF "%COMMAND%" == "m" (
-    git branch > "%buff%"
+    git branch --sort=-committerdate > "%buff%"
     CALL :SelectOneFromList "Select branch for merge in current"
     IF NOT [!ONEFORMLIST!] == [] (
         git merge --no-ff !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "b" (
-    git branch > "%buff%"
+    git branch --sort=-committerdate > "%buff%"
     CALL :ShowList "Branches:"
 )
 IF "%COMMAND%" == "cb" (
-    git branch > "%buff%"
+    git branch --sort=-committerdate > "%buff%"
     CALL :SelectOneFromList "Select branch for checkout"
     IF NOT [!ONEFORMLIST!] == [] (
         git checkout !ONEFORMLIST:~2!
@@ -97,7 +97,7 @@ IF "%COMMAND%" == "cb+r" (
     )
 )
 IF "%COMMAND%" == "db" (
-    git branch > "%buff%"
+    git branch --sort=-committerdate > "%buff%"
     CALL :SelectOneFromList "Select branch for delete"
     IF NOT [!ONEFORMLIST!] == [] (
         git branch -d !ONEFORMLIST:~2!
