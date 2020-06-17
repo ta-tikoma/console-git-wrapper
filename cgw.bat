@@ -39,7 +39,7 @@ IF "%COMMAND%" == "c" (
     )
     SET /p COMMIT=Commit text ^(e - cancel^)? 
     IF NOT "%COMMIT%" == "e" (
-        ECHO ^("%COMMIT%"^)
+        ECHO ^("!COMMIT!"^)
         git commit -m "!COMMIT!"
     )
 )
