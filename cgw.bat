@@ -38,8 +38,7 @@ IF "%COMMAND%" == "c" (
         git !GITCOMMAND! !TYPE:~3!
     )
     SET /p COMMIT=Commit text ^(e - cancel^)? 
-    IF NOT "%COMMIT%" == "e" (
-        ECHO ^("!COMMIT!"^)
+    IF NOT "!COMMIT!" == "e" (
         git commit -m "!COMMIT!"
     )
 )
@@ -60,12 +59,12 @@ IF "%COMMAND%" == "cp" (
         )
         git !GITCOMMAND! !TYPE:~3!
     )
-    SET /p COMMIT=Commit text? 
-    IF NOT "%COMMIT%" == "e" (
+    SET /p COMMIT=Commit text ^(e - cancel^)? 
+    IF NOT "!COMMIT!" == "e" (
         git commit -m "!COMMIT!"
+        ECHO Push:
+        git push origin !CURRENT_BRANCH!
     )
-    ECHO Push:
-    git push origin !CURRENT_BRANCH!
 )
 IF "%COMMAND%" == "pl" (
     ECHO Pull:
@@ -126,8 +125,8 @@ IF "%COMMAND%" == "db+" (
 )
 IF "%COMMAND%" == "ab" (
     ECHO Add branch from current branch:
-    SET /p BRANCH=Branch name? 
-    IF NOT "%BRANCH%" == "e" (
+    SET /p BRANCH=Branch name ^(e - cancel^)? 
+    IF NOT "!BRANCH!" == "e" (
         git checkout -b !BRANCH! !CURRENT_BRANCH!
     )
 )
@@ -144,8 +143,8 @@ IF "%COMMAND%" == "ftf" (
 )
 IF "%COMMAND%" == "at" (
     ECHO Add tag on last commit:
-    SET /p TAG=Tag name? 
-    IF NOT "%TAG%" == "e" (
+    SET /p TAG=Tag name ^(e - cancel^)? 
+    IF NOT "!TAG!" == "e" (
         git tag !TAG!
         git push origin !TAG!
     )
