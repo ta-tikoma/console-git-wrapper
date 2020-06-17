@@ -18,6 +18,8 @@ ECHO Branch: !CURRENT_BRANCH! Path: %cd%
 SET /p COMMAND=What you want? 
 CLS
 
+rem -----------------------------------------------------
+
 IF "%COMMAND%" == "s" (
     git status -s > "%buff%"
     CALL :ShowList "Status:"
@@ -35,8 +37,10 @@ IF "%COMMAND%" == "c" (
         )
         git !GITCOMMAND! !TYPE:~3!
     )
-    SET /p COMMIT=Commit text? 
-    git commit -m "!COMMIT!"
+    SET /p COMMIT=Commit text ^(e - cancel^)? 
+    IF NOT "%COMMIT%" == "e" (
+        git commit -m "!COMMIT!"
+    )
 )
 IF "%COMMAND%" == "p" (
     ECHO Push:
@@ -56,7 +60,9 @@ IF "%COMMAND%" == "cp" (
         git !GITCOMMAND! !TYPE:~3!
     )
     SET /p COMMIT=Commit text? 
-    git commit -m "!COMMIT!"
+    IF NOT "%COMMIT%" == "e" (
+        git commit -m "!COMMIT!"
+    )
     ECHO Push:
     git push origin !CURRENT_BRANCH!
 )
@@ -78,6 +84,13 @@ IF "%COMMAND%" == "m" (
         git merge --no-ff !ONEFORMLIST:~2!
     )
 )
+IF "%COMMAND%" == "m+" (
+    git branch -r > "%buff%"
+    CALL :SelectOneFromList "Select remote branch for merge in current"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git merge --no-ff !ONEFORMLIST:~2!
+    )
+)
 IF "%COMMAND%" == "b" (
     git branch --sort=-committerdate > "%buff%"
     CALL :ShowList "Branches:"
@@ -89,7 +102,7 @@ IF "%COMMAND%" == "cb" (
         git checkout !ONEFORMLIST:~2!
     )
 )
-IF "%COMMAND%" == "cb+r" (
+IF "%COMMAND%" == "cb+" (
     git branch -r > "%buff%"
     CALL :SelectOneFromList "Select remote branch for checkout"
     IF NOT [!ONEFORMLIST!] == [] (
@@ -103,10 +116,19 @@ IF "%COMMAND%" == "db" (
         git branch -d !ONEFORMLIST:~2!
     )
 )
+IF "%COMMAND%" == "db+" (
+    git branch -r > "%buff%"
+    CALL :SelectOneFromList "Select remote branch for delete"
+    IF NOT [!ONEFORMLIST!] == [] (
+        git push origin --delete !ONEFORMLIST:~2!
+    )
+)
 IF "%COMMAND%" == "ab" (
     ECHO Add branch from current branch:
     SET /p BRANCH=Branch name? 
-    git checkout -b !BRANCH! !CURRENT_BRANCH!
+    IF NOT "%BRANCH%" == "e" (
+        git checkout -b !BRANCH! !CURRENT_BRANCH!
+    )
 )
 
 rem -----------------------------------------------------
@@ -115,15 +137,17 @@ IF "%COMMAND%" == "t" (
     git tag --sort=-creatordate > "%buff%"
     CALL :ShowList "Tags:"
 )
-IF "%COMMAND%" == "ft" (
-    ECHO Fetch tag:
+IF "%COMMAND%" == "ftf" (
+    ECHO Fetch tag force:
     git fetch --tags --force
 )
 IF "%COMMAND%" == "at" (
     ECHO Add tag on last commit:
     SET /p TAG=Tag name? 
-    git tag !TAG!
-    git push origin !TAG!
+    IF NOT "%TAG%" == "e" (
+        git tag !TAG!
+        git push origin !TAG!
+    )
 )
 IF "%COMMAND%" == "dt" (
     git tag --sort=-creatordate > "%buff%"
@@ -157,15 +181,18 @@ IF "%COMMAND%" == "h" (
     ECHO f   - fetch
     ECHO ------------------------
     ECHO m   - merge in current branch
+    ECHO m+  - merge remote in current branch
     ECHO b   - branch list
     ECHO cb  - change branch 
+    ECHO cb+ - change on remote branch 
     ECHO db  - delete branch 
+    ECHO db+ - delete remote branch 
     ECHO ab  - add branch from current branch
     ECHO ------------------------
     ECHO t   - tag list
-    ECHO ft  - fetch tag
-    ECHO dt  - delete tag
-    ECHO at  - add tag
+    ECHO ftf - fetch tag force
+    ECHO dt  - delete tag local and remote
+    ECHO at  - add tag local and remote
     ECHO ------------------------
     ECHO cf  - checkout file
     ECHO r   - reset branch
@@ -240,7 +267,7 @@ IF !OFFSET! LEQ 0 (
 )
 FOR /f "%SK%delims=" %%B in (%buff%) do (
     rem выводим строки с нумераций
-    ECHO !INDEX! %%B
+    ECHO %%B ^(!INDEX!^)
     rem инкрементируем нумерацию
     SET /A INDEX=INDEX+1
     rem ограничиваем вывод десятью строками
