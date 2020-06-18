@@ -37,7 +37,7 @@ IF "%COMMAND%" == "c" (
         )
         git !GITCOMMAND! !TYPE:~3!
     )
-    SET /p COMMIT=Commit text ^(e - cancel^)? 
+    SET /p COMMIT=Commit text ^(e - cancel^): 
     IF NOT "!COMMIT!" == "e" (
         git commit -m "!COMMIT!"
     )
@@ -59,7 +59,7 @@ IF "%COMMAND%" == "cp" (
         )
         git !GITCOMMAND! !TYPE:~3!
     )
-    SET /p COMMIT=Commit text ^(e - cancel^)? 
+    SET /p COMMIT=Commit text ^(e - cancel^): 
     IF NOT "!COMMIT!" == "e" (
         git commit -m "!COMMIT!"
         ECHO Push:
@@ -79,14 +79,14 @@ rem -----------------------------------------------------
 
 IF "%COMMAND%" == "m" (
     git branch --sort=-committerdate > "%buff%"
-    CALL :SelectOneFromList "Select branch for merge in current"
+    CALL :SelectOneFromList "Select branch for merge in current: "
     IF NOT [!ONEFORMLIST!] == [] (
         git merge --no-ff !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "m+" (
     git branch -r > "%buff%"
-    CALL :SelectOneFromList "Select remote branch for merge in current"
+    CALL :SelectOneFromList "Select remote branch for merge in current: "
     IF NOT [!ONEFORMLIST!] == [] (
         git merge --no-ff !ONEFORMLIST:~2!
     )
@@ -95,37 +95,42 @@ IF "%COMMAND%" == "b" (
     git branch --sort=-committerdate > "%buff%"
     CALL :ShowList "Branches:"
 )
+IF "%COMMAND%" == "b+" (
+    git branch -r > "%buff%"
+    CALL :ShowList "Remote branches:"
+)
 IF "%COMMAND%" == "cb" (
     git branch --sort=-committerdate > "%buff%"
-    CALL :SelectOneFromList "Select branch for checkout"
+    CALL :SelectOneFromList "Select branch for checkout: "
     IF NOT [!ONEFORMLIST!] == [] (
         git checkout !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "cb+" (
     git branch -r > "%buff%"
-    CALL :SelectOneFromList "Select remote branch for checkout"
+    CALL :SelectOneFromList "Select remote branch for checkout: "
     IF NOT [!ONEFORMLIST!] == [] (
         git checkout -t !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "db" (
     git branch --sort=-committerdate > "%buff%"
-    CALL :SelectOneFromList "Select branch for delete"
+    CALL :SelectOneFromList "Select branch for delete: "
     IF NOT [!ONEFORMLIST!] == [] (
         git branch -d !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "db+" (
     git branch -r > "%buff%"
-    CALL :SelectOneFromList "Select remote branch for delete"
+    CALL :SelectOneFromList "Select remote branch for delete: "
     IF NOT [!ONEFORMLIST!] == [] (
-        git push origin --delete !ONEFORMLIST:~2!
+        rem удаляем origin/
+        git push origin --delete !ONEFORMLIST:~9!
     )
 )
 IF "%COMMAND%" == "ab" (
     ECHO Add branch from current branch:
-    SET /p BRANCH=Branch name ^(e - cancel^)? 
+    SET /p BRANCH=Branch name ^(e - cancel^):  
     IF NOT "!BRANCH!" == "e" (
         git checkout -b !BRANCH! !CURRENT_BRANCH!
     )
@@ -143,7 +148,7 @@ IF "%COMMAND%" == "ftf" (
 )
 IF "%COMMAND%" == "at" (
     ECHO Add tag on last commit:
-    SET /p TAG=Tag name ^(e - cancel^)? 
+    SET /p TAG=Tag name ^(e - cancel^):  
     IF NOT "!TAG!" == "e" (
         git tag !TAG!
         git push origin !TAG!
@@ -151,7 +156,7 @@ IF "%COMMAND%" == "at" (
 )
 IF "%COMMAND%" == "dt" (
     git tag --sort=-creatordate > "%buff%"
-    CALL :SelectOneFromList "Select tag for delete"
+    CALL :SelectOneFromList "Select tag for delete: "
     IF NOT [!ONEFORMLIST!] == [] (
         git tag -d !ONEFORMLIST!
         git push --delete origin !ONEFORMLIST!
@@ -166,7 +171,7 @@ IF "%COMMAND%" == "r" (
 )
 IF "%COMMAND%" == "cf" (
     git status -s > "%buff%"
-    CALL :SelectOneFromList "Select file for checkout"
+    CALL :SelectOneFromList "Select file for checkout: "
     IF NOT [!ONEFORMLIST!] == [] (
         git checkout !ONEFORMLIST:~2!
     )
@@ -232,7 +237,7 @@ FOR /f "%SK%delims=" %%B in (%buff%) do (
 )
 :showListEnd
 
-CHOICE /C jke /N /M "j and k for scroll list, e - close"
+CHOICE /C jke /N /M "j and k for scroll list, e - close: "
 IF %ERRORLEVEL% EQU 1 (
     SET /A OFFSET=OFFSET+1
     GOTO :showListBegin
@@ -277,7 +282,7 @@ FOR /f "%SK%delims=" %%B in (%buff%) do (
 )
 :selectOneFromListEnd
 
-CHOICE /C 0123456789jke /N /M "j and k for scroll list, e - close, 0-9 for make choice"
+CHOICE /C 0123456789jke /N /M "j and k for scroll list, e - close, 0-9 for make choice: "
 rem список вниз
 IF %ERRORLEVEL% EQU 11 (
     SET /A OFFSET=OFFSET+1
