@@ -176,6 +176,9 @@ IF "%COMMAND%" == "cf" (
         git checkout !ONEFORMLIST:~2!
     )
 )
+
+rem -----------------------------------------------------
+
 IF "%COMMAND%" == "h" (
     ECHO Help:
     ECHO s   - show status
