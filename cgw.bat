@@ -209,6 +209,8 @@ IF "%COMMAND%" == "h" (
     ECHO e   - exit
 )
 
+rem -----------------------------------------------------
+
 IF NOT "%COMMAND%" == "e" GOTO loop
 rem EXIT /B %ERRORLEVEL%
 EXIT /B 0
