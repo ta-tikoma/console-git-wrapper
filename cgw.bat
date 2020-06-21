@@ -258,6 +258,7 @@ rem функция для вывода списка
 :SelectOneFromList
 SET /A OFFSET=0
 SET ONEFORMLIST=
+SET SUBSTRING=
 
 :selectOneFromListBegin
 CLS
@@ -270,7 +271,17 @@ IF !OFFSET! LEQ 0 (
 ) ELSE (
     SET SK=skip=%OFFSET%
 )
-FOR /f "%SK%delims=" %%B in (%buff%) do (
+
+rem если указана подстрока то фильтруем по ней
+IF NOT [!SUBSTRING!] == [] (
+    ECHO Filter by "!SUBSTRING!"
+    SET SOURCE='FINDSTR /Li /c:"%SUBSTRING%" %buff%'
+) ELSE (
+    SET SOURCE=%buff%
+)
+
+rem цикл прохождения по строкам
+FOR /f "%SK%delims=" %%B in (%SOURCE%) do (
     rem выводим строки с нумераций
     ECHO %%B ^(!INDEX!^)
     rem инкрементируем нумерацию
@@ -282,7 +293,7 @@ FOR /f "%SK%delims=" %%B in (%buff%) do (
 )
 :selectOneFromListEnd
 
-CHOICE /C 0123456789jke /N /M "j and k for scroll list, e - close, 0-9 for make choice: "
+CHOICE /C 0123456789jkefd /N /M "j and k for scroll list, e - close, f - filter, d - disable filter, 0-9 for make choice: "
 rem список вниз
 IF %ERRORLEVEL% EQU 11 (
     SET /A OFFSET=OFFSET+1
@@ -298,9 +309,22 @@ IF %ERRORLEVEL% EQU 13 (
     CLS
     EXIT /B 0
 )
+rem поиск по подстроке
+IF %ERRORLEVEL% EQU 14 (
+    SET /p SUBSTRING=Substring to search ^(e - cancel^): 
+    IF "!SUBSTRING!" == "e" (
+        SET SUBSTRING=
+    )
+    GOTO :selectOneFromListBegin
+)
+rem сбрасываем поиск
+IF %ERRORLEVEL% EQU 15 (
+    SET SUBSTRING=
+    GOTO :selectOneFromListBegin
+)
 rem выбор сделан находим вариант и возвращаем его
 SET /A INDEX = 1
-FOR /f "%SK%delims=" %%B in (%buff%) do (
+FOR /f "%SK%delims=" %%B in (%SOURCE%) do (
     IF !INDEX! == !ERRORLEVEL! (
         SET ONEFORMLIST=%%B
     )
