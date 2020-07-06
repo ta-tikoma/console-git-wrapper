@@ -99,6 +99,18 @@ IF "%COMMAND%" == "b+" (
     git branch -r > "%buff%"
     CALL :ShowList "Remote branches:"
 )
+IF "%COMMAND%" == "rnb" (
+    ECHO Rename current branch:
+    SET /p BRANCH=New name to current branch ^(e - cancel^):  
+    IF NOT "!BRANCH!" == "e" (
+        rem Создаем новую ветку из текущей с новым именем
+        git checkout -b !BRANCH! !CURRENT_BRANCH!
+        rem Удаляем локально
+        git branch -d !CURRENT_BRANCH!
+        rem Удаляем и в репоизитории
+        git push origin --delete !CURRENT_BRANCH!
+    )
+)
 IF "%COMMAND%" == "cb" (
     git branch --sort=-committerdate > "%buff%"
     CALL :SelectOneFromList "Select branch for checkout: "
@@ -117,7 +129,7 @@ IF "%COMMAND%" == "db" (
     git branch --sort=-committerdate > "%buff%"
     CALL :SelectOneFromList "Select branch for delete: "
     IF NOT [!ONEFORMLIST!] == [] (
-        git branch -d !ONEFORMLIST:~2!
+        git branch -D !ONEFORMLIST:~2!
     )
 )
 IF "%COMMAND%" == "db+" (
@@ -162,6 +174,16 @@ IF "%COMMAND%" == "dt" (
         git push --delete origin !ONEFORMLIST!
     )
 )
+IF "%COMMAND%" == "mt" (
+    git tag --sort=-creatordate > "%buff%"
+    CALL :SelectOneFromList "Select tag for move: "
+    IF NOT [!ONEFORMLIST!] == [] (
+        git tag -d !ONEFORMLIST!
+        git push --delete origin !ONEFORMLIST!
+        git tag !ONEFORMLIST!
+        git push origin !ONEFORMLIST!
+    )
+)
 
 rem -----------------------------------------------------
 
@@ -191,6 +213,8 @@ IF "%COMMAND%" == "h" (
     ECHO m   - merge in current branch
     ECHO m+  - merge remote in current branch
     ECHO b   - branch list
+    ECHO b+  - remote branch list
+    ECHO rnb - rename current branch
     ECHO cb  - change branch 
     ECHO cb+ - change on remote branch 
     ECHO db  - delete branch 
@@ -201,6 +225,7 @@ IF "%COMMAND%" == "h" (
     ECHO ftf - fetch tag force
     ECHO dt  - delete tag local and remote
     ECHO at  - add tag local and remote
+    ECHO mt  - remove tag from old commit and add to current
     ECHO ------------------------
     ECHO cf  - checkout file
     ECHO r   - reset branch

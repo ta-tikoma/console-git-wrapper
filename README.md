@@ -21,8 +21,11 @@ f   - `f`etch
 
 ### branch:
 m   - `m`erge selected branch in current  
-b   - `b`ranch list (and update current branch)  
+m+  - `m`erge remote branch in current  
+b   - `b`ranch list 
+b+  -  remote `b`ranch list 
 cb  - `c`hange `b`ranch   
+cb+ - `c`hange on remote branch `b`ranch   
 db  - `d`elete `b`ranch  
 ab  - `a`dd `b`ranch  
 
@@ -31,6 +34,7 @@ t   - `t`ag list
 ft  - `f`etch `t`ag  
 dt  - `d`elete `t`ag  
 at  - `a`dd `t`ag on last commit  
+mt  - re`m`ove `t`ag from old commit and add to current 
 
 ### other:
 cf  - `c`heckout `f`ile  
