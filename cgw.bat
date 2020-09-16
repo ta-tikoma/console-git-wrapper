@@ -7,9 +7,12 @@ exit /b
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 SET LC_ALL=C.UTF-8
+CHCP 65001
 
 REM define buffer file
 SET "buff=%tmp%\cgw~%RANDOM%.tmp"
+
+CLS
 
 :loop
 FOR /f "delims=" %%I in ('git rev-parse --abbrev-ref HEAD') do SET CURRENT_BRANCH=%%I
@@ -147,6 +150,10 @@ IF "%COMMAND%" == "ab" (
         git checkout -b !BRANCH! !CURRENT_BRANCH!
     )
 )
+IF "%COMMAND%" == "bh" (
+    git log --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "%buff%"
+    CALL :ShowList "Branch history:"
+)
 
 rem -----------------------------------------------------
 
@@ -220,6 +227,7 @@ IF "%COMMAND%" == "h" (
     ECHO db  - delete branch 
     ECHO db+ - delete remote branch 
     ECHO ab  - add branch from current branch
+    ECHO bh  - current branch history
     ECHO ------------------------
     ECHO t   - tag list
     ECHO ftf - fetch tag force

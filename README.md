@@ -30,6 +30,7 @@ cb+ - `c`hange on remote branch `b`ranch
 db  - `d`elete `b`ranch  
 db+ - `d`elete remote `b`ranch  
 ab  - `a`dd `b`ranch  
+bh  - current `b`ranch `h`istory
 
 ### tag:
 t   - `t`ag list  
