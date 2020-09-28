@@ -157,6 +157,16 @@ IF "%COMMAND%" == "bh" (
 
 rem -----------------------------------------------------
 
+IF "%COMMAND%" == "rc" (
+    git log --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "%buff%"
+    CALL :SelectOneFromList "Select commit for revert: "
+    IF NOT [!ONEFORMLIST!] == [] (
+        git revert !ONEFORMLIST:~0,8! --no-edit
+    )
+)
+
+rem -----------------------------------------------------
+
 IF "%COMMAND%" == "t" (
     git tag --sort=-creatordate > "%buff%"
     CALL :ShowList "Tags:"
@@ -228,6 +238,8 @@ IF "%COMMAND%" == "h" (
     ECHO db+ - delete remote branch 
     ECHO ab  - add branch from current branch
     ECHO bh  - current branch history
+    ECHO ------------------------
+    ECHO rc  - revert commit
     ECHO ------------------------
     ECHO t   - tag list
     ECHO ftf - fetch tag force
