@@ -13,14 +13,14 @@ Symple console git client wrapper. It script for wrap git commands and quickly e
   
 | Short | Description |
 | --- | --- |
-| Base |
+| *Base* ||
 | s   | show `s`tatus  |
 | c   | `c`ommit all changed files  |
 | p   | `p`ush to current branch  |
 | cp  | `c`ommit all changed files and `p`ush to current branch  |
 | pl  | `p`u`l`l form current branch  |
 | f   | `f`etch  |
-| Branch ||
+| *Branch* ||
 | m   | `m`erge selected branch in current  |
 | m+  | `m`erge remote branch in current  |
 | b   | `b`ranch list |
@@ -32,7 +32,7 @@ Symple console git client wrapper. It script for wrap git commands and quickly e
 | db+ | `d`elete remote `b`ranch  |
 | ab  | `a`dd `b`ranch  |
 | bh  | current `b`ranch `h`istory|
-| Commit ||
+| *Commit* ||
 | rc  | `r`evert `c`ommit  |
 | Tag ||
 | t   | `t`ag list  |
@@ -40,9 +40,9 @@ Symple console git client wrapper. It script for wrap git commands and quickly e
 | dt  | `d`elete `t`ag  local and remote|
 | at  | `a`dd `t`ag on last commit local and remote|
 | mt  | re`m`ove `t`ag from old commit and add to current |
-| Other ||
+| *Other* ||
 | cf  | `c`heckout `f`ile  |
 | r   | hard `r`eset branch  |
-| Program ||
+| *Program* ||
 | h   | `h`elp  |
 | e   | `e`xit  |
