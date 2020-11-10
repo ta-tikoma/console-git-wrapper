@@ -5,7 +5,7 @@ buff=$(mktemp /tmp/cgw-$RANDOM.XXXXXX)
 # функции
 ShowList()
 {
-    OFFSER=0
+    OFFSET=0
     valid=true
 
     while [ valid ]
@@ -17,7 +17,11 @@ ShowList()
 
         for (( INDEX=0; INDEX<10; INDEX++ ))
         do
-            CURENT_INDEX=$(($OFFSET + $INDEX))
+            local CURENT_INDEX=$(($OFFSET + $INDEX))
+            if [ "$CURENT_INDEX" = "${#LINES[@]}" ]
+            then
+                break
+            fi
             echo "${LINES[CURENT_INDEX]}"
         done
 
@@ -39,7 +43,8 @@ ShowList()
 SelectOneFromList()
 {
     ONEFORMLIST=""
-    OFFSER=0
+    FILTER=""
+    OFFSET=0
     valid=true
 
     while [ valid ]
@@ -49,13 +54,23 @@ SelectOneFromList()
         echo $@
         IFS=$'\n' read -d '' -r -a LINES < "$buff"
 
+        if [ "$FILTER" != "" ];
+        then
+            FILTER="*22*"
+            LINES=${(M)LINES:#$~FILTER}
+        fi
+
         for (( INDEX=0; INDEX<10; INDEX++ ))
         do
             CURENT_INDEX=$(($OFFSET + $INDEX))
+            if [ "$CURENT_INDEX" = "${#LINES[@]}" ]
+            then
+                break
+            fi
             echo "$INDEX ${LINES[CURENT_INDEX]}"
         done
 
-        read -n1 -p "j and k for scroll list, e - close: " LEVEL
+        read -n1 -p "j and k for scroll list, e - close, f - filter, d - disable filter, 0-9 for make choice: " LEVEL
         if [ "$LEVEL" = "e" ];
         then
             clear
@@ -66,6 +81,14 @@ SelectOneFromList()
         elif [ "$LEVEL" = "k" ];
         then
             OFFSET=$(($OFFSET - 1))
+        elif [ "$LEVEL" = "f" ];
+        then
+            echo ""
+            read -e -p "Substring to search (e - cansel): " FILTER
+            if [ "$FILTER" = "e" ];
+            then
+                FILTER=""
+            fi
         else
             CURENT_INDEX=$(($OFFSET + $LEVEL))
             ONEFORMLIST="${LINES[CURENT_INDEX]}"
@@ -84,7 +107,7 @@ do
 
     echo "______________________________________________________________"
     echo "Branch $CURRENT_BRANCH Path: $CURRENT_PATH"
-    read -p "What you want? " COMMAND
+    read -e -p "What you want? " COMMAND
     clear
 
     if [ "$COMMAND" = "s" ];
@@ -95,20 +118,21 @@ do
     then
         echo "Files add to commit:"
 
-        git status -s |
-        while read -r LINE
-        do
-            if [ "${LINE:0:2}" = " D" ];
-            then
-                GITCOMMAND="rm"
-            else
-                GITCOMMAND="add"
-                echo "add ${LINE:2}"
-            fi
-            git $GITCOMMAND "${LINE:2}"
-        done
+        git add .
+        # git status -s |
+        # while read -r LINE
+        # do
+        #     if [ "${LINE:0:2}" = " D" ];
+        #     then
+        #         GITCOMMAND="rm"
+        #     else
+        #         GITCOMMAND="add"
+        #         echo "add ${LINE:2}"
+        #     fi
+        #     git $GITCOMMAND "${LINE:2}"
+        # done
 
-        read -p "Commit test (e -cancel): " COMMIT
+        read -e -p "Commit test (e -cancel): " COMMIT
         if [ "$COMMIT" != "e" ];
         then
             git commit -m $COMMIT
@@ -121,20 +145,21 @@ do
     then
         echo "Files add to commit:"
 
-        git status -s |
-        while read -r LINE
-        do
-            if [ "${LINE:0:2}" = " D" ];
-            then
-                GITCOMMAND="rm"
-            else
-                GITCOMMAND="add"
-                echo "add ${LINE:2}"
-            fi
-            git $GITCOMMAND "${LINE:2}"
-        done
+        git add .
+        # git status -s |
+        # while read -r LINE
+        # do
+        #     if [ "${LINE:0:2}" = " D" ];
+        #     then
+        #         GITCOMMAND="rm"
+        #     else
+        #         GITCOMMAND="add"
+        #         echo "add ${LINE:2}"
+        #     fi
+        #     git $GITCOMMAND "${LINE:2}"
+        # done
 
-        read -p "Commit test (e - cancel): " COMMIT
+        read -e -p "Commit test (e - cancel): " COMMIT
         if [ "$COMMIT" != "e" ];
         then
             git commit -m "$COMMIT"
@@ -151,7 +176,7 @@ do
         SelectOneFromList "Select branch for merge in current: "
         if [ "$ONEFORMLIST" != "" ];
         then
-             git merge --no-ff "${ONEFORMLIST:2}"
+             git merge --no-ff --no-edit "${ONEFORMLIST:2}"
         fi
     elif [ "$COMMAND" = "m+" ];
     then
@@ -159,7 +184,7 @@ do
         SelectOneFromList "Select remote branch for merge in current: "
         if [ "$ONEFORMLIST" != "" ];
         then
-             git merge --no-ff "${ONEFORMLIST:2}"
+             git merge --no-ff --no-edit "${ONEFORMLIST:2}"
         fi
     elif [ "$COMMAND" = "b" ];
     then
@@ -172,7 +197,7 @@ do
     elif [ "$COMMAND" = "rnb" ];
     then
         echo "Rename current branch:"
-        read -p "New name to current branch (e - cancel): " BRANCH
+        read -e -p "New name to current branch (e - cancel): " BRANCH
         if [ "$BRANCH" != "e" ];
         then
             git checkout -b "$BRANCH" "$CURRENT_BRANCH"
@@ -195,27 +220,43 @@ do
         then
             git checkout -t "${ONEFORMLIST:2}"
         fi
+    elif [ "$COMMAND" = "db" ];
+    then
+        git branch --sort=-committerdate > "$buff"
+        SelectOneFromList "Select branch for delete: "
+        if [ "$ONEFORMLIST" != "" ];
+        then
+            git branch -D "${ONEFORMLIST:2}"
+        fi
+    elif [ "$COMMAND" = "db+" ];
+    then
+        git branch -r > "$buff"
+        SelectOneFromList "Select remote branch for delete: "
+        if [ "$ONEFORMLIST" != "" ];
+        then
+            git push origin --delete  "${ONEFORMLIST:9}"
+        fi
     elif [ "$COMMAND" = "ab" ];
     then
         echo "Add branch from current branch"
-        read -p "Branch name (e - cancel): " BRANCH
+        read -e -p "Branch name (e - cancel): " BRANCH
         if [ "$BRANCH" != "e" ];
         then
             git checkout -b  "$BRANCH" "$CURRENT_BRANCH"
         fi
     elif [ "$COMMAND" = "bh" ];
     then
-        git log --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "$buff"
+        git log --pretty=format:"%h | %<(30)%an | %<(30)%ar | %s" > "$buff"
         ShowList "Branch history:"
     # --------------------------------------------
     elif [ "$COMMAND" = "rc" ];
     then
-        git log --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "$buff"
+        git log --pretty=format:"%h | %<(30)%an | %<(30)%ar | %s" > "$buff"
         SelectOneFromList "Select commit for revert: "
         if [ "$ONEFORMLIST" != "" ];
         then
-            # git revert !ONEFORMLIST:~0,8! --no-edit
-            echo "${ONEFORMLIST:8}"
+            git revert "${ONEFORMLIST:0:8}" --no-edit
+            echo
         fi
     # --------------------------------------------
     elif [ "$COMMAND" = "t" ];
@@ -229,7 +270,7 @@ do
     elif [ "$COMMAND" = "at" ];
     then
         echo "Add tag on last commit:"
-        read -p "Tag name (e - cancel): " TAG
+        read -e -p "Tag name (e - cancel): " TAG
         if [ "$TAG" != "e" ];
         then
             git tag "$TAG"
@@ -266,7 +307,7 @@ do
         SelectOneFromList "Select file for checkout: "
         if [ "$ONEFORMLIST" != "" ];
         then
-            git checkout "${ONEFORMLIST:2}"
+            git checkout "${ONEFORMLIST:3}"
         fi
     # --------------------------------------------
     elif [ "$COMMAND" = "h" ];
