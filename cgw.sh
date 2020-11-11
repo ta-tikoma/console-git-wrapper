@@ -1,6 +1,7 @@
 #!/bin/bash
 
 buff=$(mktemp /tmp/cgw-$RANDOM.XXXXXX)
+buff2=$(mktemp /tmp/cgw2-$RANDOM.XXXXXX)
 
 # функции
 ShowList()
@@ -18,24 +19,21 @@ ShowList()
         for (( INDEX=0; INDEX<10; INDEX++ ))
         do
             local CURENT_INDEX=$(($OFFSET + $INDEX))
-            if [ "$CURENT_INDEX" = "${#LINES[@]}" ]
-            then
-                break
-            fi
             echo "${LINES[CURENT_INDEX]}"
         done
 
         read -n1 -p "j and k for scroll list, e - close: " LEVEL
-        if [ "$LEVEL" = "e" ];
-        then
+        if [ "$LEVEL" = "e" ]; then
             clear
             break;
-        elif [ "$LEVEL" = "j" ];
-        then
-            OFFSET=$(($OFFSET + 1))
-        elif [ "$LEVEL" = "k" ];
-        then
-            OFFSET=$(($OFFSET - 1))
+        elif [ "$LEVEL" = "j" ]; then
+            if [ $(($OFFSET + 11)) -le ${#LINES[@]} ]; then
+                OFFSET=$(($OFFSET + 1))
+            fi
+        elif [ "$LEVEL" = "k" ]; then
+            if [ $(($OFFSET - 1)) -ge 0 ]; then
+                OFFSET=$(($OFFSET - 1))
+            fi
         fi
     done
 }
@@ -52,12 +50,13 @@ SelectOneFromList()
         clear
 
         echo $@
-        IFS=$'\n' read -d '' -r -a LINES < "$buff"
 
         if [ "$FILTER" != "" ];
         then
-            FILTER="*22*"
-            LINES=${(M)LINES:#$~FILTER}
+            cat "$buff" | grep "$FILTER" > "$buff2"
+            IFS=$'\n' read -d '' -r -a LINES < "$buff2"
+        else
+            IFS=$'\n' read -d '' -r -a LINES < "$buff"
         fi
 
         for (( INDEX=0; INDEX<10; INDEX++ ))
@@ -71,22 +70,23 @@ SelectOneFromList()
         done
 
         read -n1 -p "j and k for scroll list, e - close, f - filter, d - disable filter, 0-9 for make choice: " LEVEL
-        if [ "$LEVEL" = "e" ];
-        then
+        if [ "$LEVEL" = "e" ]; then
             clear
             break
-        elif [ "$LEVEL" = "j" ];
-        then
-            OFFSET=$(($OFFSET + 1))
-        elif [ "$LEVEL" = "k" ];
-        then
-            OFFSET=$(($OFFSET - 1))
-        elif [ "$LEVEL" = "f" ];
-        then
+        elif [ "$LEVEL" = "j" ]; then
+            if [ $(($OFFSET + 11)) -le ${#LINES[@]} ]; then
+                OFFSET=$(($OFFSET + 1))
+            fi
+        elif [ "$LEVEL" = "k" ]; then
+            if [ $(($OFFSET - 1)) -ge 0 ]; then
+                OFFSET=$(($OFFSET - 1))
+            fi
+        elif [ "$LEVEL" = "d" ]; then
+            FILTER=""
+        elif [ "$LEVEL" = "f" ]; then
             echo ""
             read -e -p "Substring to search (e - cansel): " FILTER
-            if [ "$FILTER" = "e" ];
-            then
+            if [ "$FILTER" = "e" ]; then
                 FILTER=""
             fi
         else
