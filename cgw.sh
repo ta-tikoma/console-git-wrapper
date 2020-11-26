@@ -27,7 +27,7 @@ ShowList()
             clear
             break;
         elif [ "$LEVEL" = "j" ]; then
-            if [ $(($OFFSET + 11)) -le ${#LINES[@]} ]; then
+            if [ $(($OFFSET + 10 + 1)) -le ${#LINES[@]} ]; then
                 OFFSET=$(($OFFSET + 1))
             fi
         elif [ "$LEVEL" = "k" ]; then
@@ -97,6 +97,23 @@ SelectOneFromList()
         fi
     done
 }
+
+# история файла
+if [ ! -z "$1" ]; then
+    while true
+    do
+        git log --pretty=format:"%h | %<(30)%an | %<(30)%ar | %s" "$1" > "$buff"
+        SelectOneFromList "File history:"
+        if [ "$ONEFORMLIST" != "" ]; then
+            git show --output="$buff" "${ONEFORMLIST:0:8}" -- "$1"
+            # read -p "Press any key to continue... " -n1 -s
+            # git show "${ONEFORMLIST:0:8}" -- "$1" > "$buff"
+            ShowList "Commit ${ONEFORMLIST:0:8}:"
+        else
+            exit 0
+        fi
+    done
+fi
 
 # основной цикл
 valid=true
@@ -301,17 +318,14 @@ do
     then
         echo "Reset:"
         git reset --hard HEAD
-    elif [ "$COMMAND" = "cf" ];
-    then
+    elif [ "$COMMAND" = "cf" ]; then
         git status -s > "$buff"
         SelectOneFromList "Select file for checkout: "
         if [ "$ONEFORMLIST" != "" ];
         then
             git checkout "${ONEFORMLIST:3}"
         fi
-    # --------------------------------------------
-    elif [ "$COMMAND" = "h" ];
-    then
+    elif [ "$COMMAND" = "h" ]; then
         echo "Help:"
         echo "s   - show status"
         echo "c   - commit all changed files"
@@ -341,6 +355,7 @@ do
         echo "mt  - remove tag from old commit and add to current"
         echo "------------------------"
         echo "cf  - checkout file"
+        # echo "fh  - file history"
         echo "r   - reset branch"
         echo "------------------------"
         echo "h   - help"
