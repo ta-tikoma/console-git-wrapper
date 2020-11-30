@@ -135,6 +135,7 @@ do
     then
         echo "Files add to commit:"
 
+        git status -s
         git add .
         # git status -s |
         # while read -r LINE
@@ -162,6 +163,7 @@ do
     then
         echo "Files add to commit:"
 
+        git status -s
         git add .
         # git status -s |
         # while read -r LINE
@@ -261,6 +263,19 @@ do
         then
             git checkout -b  "$BRANCH" "$CURRENT_BRANCH"
         fi
+    elif [ "$COMMAND" = "bfc" ];
+    then
+        git log --pretty=format:"%h | %<(30)%an | %<(30)%ar | %s" > "$buff"
+        SelectOneFromList "Select commit for new branch: "
+        if [ "$ONEFORMLIST" != "" ];
+        then
+            echo "Add branch from commit ${ONEFORMLIST:0:8}"
+            read -e -p "Branch name (e - cancel): " BRANCH
+            if [ "$BRANCH" != "e" ];
+            then
+                git checkout -b  "$BRANCH" "${ONEFORMLIST:0:8}"
+            fi
+        fi
     elif [ "$COMMAND" = "bh" ];
     then
         git log --pretty=format:"%h | %<(30)%an | %<(30)%ar | %s" > "$buff"
@@ -344,6 +359,7 @@ do
         echo "db  - delete branch "
         echo "db+ - delete remote branch "
         echo "ab  - add branch from current branch"
+        echo "bfc - branch from commit"
         echo "bh  - current branch history"
         echo "------------------------"
         echo "rc  - revert commit"

@@ -150,6 +150,17 @@ IF "%COMMAND%" == "ab" (
         git checkout -b !BRANCH! !CURRENT_BRANCH!
     )
 )
+IF "%COMMAND%" == "bfc" (
+    git log --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "%buff%"
+    CALL :SelectOneFromList "Select commit for new branch: "
+    IF NOT [!ONEFORMLIST!] == [] (
+        ECHO Add branch from commit '!ONEFORMLIST:~0,8!'
+        SET /p BRANCH=Branch name ^(e - cancel^):  
+        IF NOT "!BRANCH!" == "e" (
+            git checkout -b !BRANCH! !ONEFORMLIST:~0,8!
+        )
+    )
+)
 IF "%COMMAND%" == "bh" (
     git log --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "%buff%"
     CALL :ShowList "Branch history:"
@@ -237,6 +248,7 @@ IF "%COMMAND%" == "h" (
     ECHO db  - delete branch 
     ECHO db+ - delete remote branch 
     ECHO ab  - add branch from current branch
+    ECHO bfc - branch from commit
     ECHO bh  - current branch history
     ECHO ------------------------
     ECHO rc  - revert commit
