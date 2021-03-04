@@ -2,6 +2,7 @@
 Symple console git client wrapper. It script for wrap git commands and quickly exec him.
 
 ![Screenshot](https://github.com/ta-tikoma/console-git-wrapper/raw/master/screenshot.png)
+![Video](https://preview.redd.it/moyam4i058651.gif?format=mp4&s=ab6564f0a074fff2586d733c70c1f0ef95166e3f)
 
 # Install
 1. Clone repository.
@@ -34,7 +35,7 @@ Symple console git client wrapper. It script for wrap git commands and quickly e
 | bh  | current `b`ranch `h`istory|
 | *Commit* ||
 | rc  | `r`evert `c`ommit  |
-| Tag ||
+| *Tag* ||
 | t   | `t`ag list  |
 | ftf | `f`etch `t`ag `f`orce |
 | dt  | `d`elete `t`ag  local and remote|
