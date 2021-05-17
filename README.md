@@ -20,6 +20,7 @@ Symple console git client wrapper. It script for wrap git commands and quickly e
 | cp  | `c`ommit all changed files and `p`ush to current branch  |
 | pl  | `p`u`l`l form current branch  |
 | f   | `f`etch  |
+| ff  | `f`etch `f`orce  |
 | *Branch* ||
 | m   | `m`erge selected branch in current  |
 | m+  | `m`erge remote branch in current  |

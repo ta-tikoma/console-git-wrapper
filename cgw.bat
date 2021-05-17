@@ -77,6 +77,10 @@ IF "%COMMAND%" == "f" (
     ECHO Fetch:
     git fetch
 )
+IF "%COMMAND%" == "f" (
+    ECHO Fetch force:
+    git fetch --force
+)
 
 rem -----------------------------------------------------
 
@@ -237,6 +241,7 @@ IF "%COMMAND%" == "h" (
     ECHO cp  - commit all changed fales and push to current branch
     ECHO pl  - pull form current branch
     ECHO f   - fetch
+    ECHO ff  - fetch force
     ECHO ------------------------
     ECHO m   - merge in current branch
     ECHO m+  - merge remote in current branch

@@ -188,6 +188,10 @@ do
     then
         echo "Pull:"
         git pull origin $CURRENT_BRANCH
+    elif [ "$COMMAND" = "ff" ];
+    then
+        echo "Fetch force:"
+        git fetch --force
     # --------------------------------------------
     elif [ "$COMMAND" = "m" ];
     then
@@ -348,6 +352,7 @@ do
         echo "cp  - commit all changed fales and push to current branch"
         echo "pl  - pull form current branch"
         echo "f   - fetch"
+        echo "ff  - fetch force"
         echo "------------------------"
         echo "m   - merge in current branch"
         echo "m+  - merge remote in current branch"
