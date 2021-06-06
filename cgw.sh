@@ -284,6 +284,10 @@ do
     then
         git log --pretty=format:"%h | %<(30)%an | %<(30)%ar | %s" > "$buff"
         ShowList "Branch history:"
+    elif [ "$COMMAND" = "bp" ];
+    then
+        echo "Remote prune origin:"
+        git remote prune origin
     # --------------------------------------------
     elif [ "$COMMAND" = "rc" ];
     then
@@ -366,6 +370,7 @@ do
         echo "ab  - add branch from current branch"
         echo "bfc - branch from commit"
         echo "bh  - current branch history"
+        echo "bp  - branch remote prune origin"
         echo "------------------------"
         echo "rc  - revert commit"
         echo "------------------------"

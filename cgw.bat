@@ -169,6 +169,10 @@ IF "%COMMAND%" == "bh" (
     git log --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "%buff%"
     CALL :ShowList "Branch history:"
 )
+IF "%COMMAND%" == "bp" (
+    ECHO Remote prune origin:
+    git remote prune origin
+)
 
 rem -----------------------------------------------------
 
@@ -255,6 +259,7 @@ IF "%COMMAND%" == "h" (
     ECHO ab  - add branch from current branch
     ECHO bfc - branch from commit
     ECHO bh  - current branch history
+    ECHO bp  - branch remote prune origin
     ECHO ------------------------
     ECHO rc  - revert commit
     ECHO ------------------------

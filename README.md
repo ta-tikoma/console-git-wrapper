@@ -28,11 +28,13 @@ Simple console git client wrapper. It script for wrap git commands and quickly e
 | b+        |  remote `b`ranch list |
 | rnb       | `r`e`n`ame current `b`ranch|
 | cb        | `c`hange `b`ranch   |
-| cb+       | `c`hange on remote branch `b`ranch   |
+| cb+       | `c`hange on remote `b`ranch   |
 | db        | `d`elete `b`ranch  |
 | db+       | `d`elete remote `b`ranch  |
 | ab        | `a`dd `b`ranch  |
+| bfc       | `b`ranch `f`rom `c`ommit  |
 | bh        | current `b`ranch `h`istory|
+| bp        | `b`ranch remote `p`rune origin |
 | *Commit*  | |
 | rc        | `r`evert `c`ommit  |
 | *Tag*     | |
