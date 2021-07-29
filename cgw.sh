@@ -213,6 +213,23 @@ do
         then
              git merge --no-ff --no-edit "${ONEFORMLIST:2}"
         fi
+    elif [ "$COMMAND" = "r" ];
+    then
+        git branch --sort=-committerdate > "$buff"
+        SelectOneFromList "Select branch for rebase in current: "
+        if [ "$ONEFORMLIST" != "" ];
+        then
+             git pull --rebase "${ONEFORMLIST:2}"
+        fi
+    elif [ "$COMMAND" = "r+" ];
+    then
+        git branch -r > "$buff"
+        SelectOneFromList "Select remote branch for rebase in current: "
+        if [ "$ONEFORMLIST" != "" ];
+        then
+             git pull --rebase "${ONEFORMLIST:2}"
+        fi
+    # --------------------------------------------
     elif [ "$COMMAND" = "b" ];
     then
         git branch --sort=-committerdate > "$buff"
@@ -365,6 +382,9 @@ do
         echo "------------------------"
         echo "m   - merge in current branch"
         echo "m+  - merge remote in current branch"
+        echo "r   - rebase in current branch"
+        echo "r+  - rebase remote in current branch"
+        echo "------------------------"
         echo "b   - branch list"
         echo "b+  - remote branch list"
         echo "rnb - rename current branch"

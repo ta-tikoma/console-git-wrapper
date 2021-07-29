@@ -102,6 +102,23 @@ IF "%COMMAND%" == "m+" (
         git merge --no-ff !ONEFORMLIST:~2!
     )
 )
+IF "%COMMAND%" == "r" (
+    git branch --sort=-committerdate > "%buff%"
+    CALL :SelectOneFromList "Select branch for rebase in current: "
+    IF NOT [!ONEFORMLIST!] == [] (
+        git pull --rebase !ONEFORMLIST:~2!
+    )
+)
+IF "%COMMAND%" == "r+" (
+    git branch -r > "%buff%"
+    CALL :SelectOneFromList "Select remote branch for rebase in current: "
+    IF NOT [!ONEFORMLIST!] == [] (
+        git pull --rebase !ONEFORMLIST:~2!
+    )
+)
+
+rem -----------------------------------------------------
+
 IF "%COMMAND%" == "b" (
     git branch --sort=-committerdate > "%buff%"
     CALL :ShowList "Branches:"
@@ -254,6 +271,9 @@ IF "%COMMAND%" == "h" (
     ECHO ------------------------
     ECHO m   - merge in current branch
     ECHO m+  - merge remote in current branch
+    ECHO r   - rebase in current branch
+    ECHO r+  - rebase remote in current branch
+    ECHO ------------------------
     ECHO b   - branch list
     ECHO b+  - remote branch list
     ECHO rnb - rename current branch
