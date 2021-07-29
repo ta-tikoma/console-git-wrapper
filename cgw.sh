@@ -131,6 +131,11 @@ do
     then
         git status -s > "$buff"
         ShowList "Status:"
+    elif [ "$COMMAND" = "a" ];
+    then
+        echo "Add files:"
+        git status -s
+        git add .
     elif [ "$COMMAND" = "c" ];
     then
         echo "Files add to commit:"
@@ -219,16 +224,17 @@ do
         SelectOneFromList "Select branch for rebase in current: "
         if [ "$ONEFORMLIST" != "" ];
         then
-             git pull --rebase "${ONEFORMLIST:2}"
+             git pull --rebase origin "${ONEFORMLIST:2}"
         fi
-    elif [ "$COMMAND" = "r+" ];
+    elif [ "$COMMAND" = "rc" ];
     then
-        git branch -r > "$buff"
-        SelectOneFromList "Select remote branch for rebase in current: "
-        if [ "$ONEFORMLIST" != "" ];
-        then
-             git pull --rebase "${ONEFORMLIST:2}"
-        fi
+        git rebase --continue
+    elif [ "$COMMAND" = "rs" ];
+    then
+        git rebase --skip
+    elif [ "$COMMAND" = "ra" ];
+    then
+        git rebase --abort
     # --------------------------------------------
     elif [ "$COMMAND" = "b" ];
     then
@@ -358,7 +364,7 @@ do
             git push origin "$ONEFORMLIST"
         fi
     # --------------------------------------------
-    elif [ "$COMMAND" = "r" ];
+    elif [ "$COMMAND" = "hr" ];
     then
         echo "Reset:"
         git reset --hard HEAD
@@ -372,6 +378,7 @@ do
     elif [ "$COMMAND" = "h" ]; then
         echo "Help:"
         echo "s   - show status"
+        echo "a   - add unstorage files"
         echo "c   - commit all changed files"
         echo "p   - push to current branch"
         echo "pf  - push force to current branch"
@@ -383,7 +390,9 @@ do
         echo "m   - merge in current branch"
         echo "m+  - merge remote in current branch"
         echo "r   - rebase in current branch"
-        echo "r+  - rebase remote in current branch"
+        echo "rc  - rebase continue"
+        echo "rs  - rebase skip"
+        echo "ra  - rebase abort"
         echo "------------------------"
         echo "b   - branch list"
         echo "b+  - remote branch list"
@@ -407,7 +416,7 @@ do
         echo "------------------------"
         echo "cf  - checkout file"
         # echo "fh  - file history"
-        echo "r   - reset branch"
+        echo "hr  - hard reset branch"
         echo "------------------------"
         echo "h   - help"
         echo "e   - exit"

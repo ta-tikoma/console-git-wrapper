@@ -27,6 +27,20 @@ IF "%COMMAND%" == "s" (
     git status -s > "%buff%"
     CALL :ShowList "Status:"
 )
+IF "%COMMAND%" == "a" (
+    ECHO Files add:
+    FOR /f "delims=" %%L in ('git status -s') do (
+        SET TYPE=%%L
+        SET GITCOMMAND=add
+        IF "!TYPE:~0,2!" == " D" (
+            SET GITCOMMAND="rm"
+            rem ECHO rm:  !TYPE!
+        ) ELSE (
+            ECHO add '!TYPE:~3!'
+        )
+        git !GITCOMMAND! !TYPE:~3!
+    )
+)
 IF "%COMMAND%" == "c" (
     ECHO Files add to commit:
     FOR /f "delims=" %%L in ('git status -s') do (
@@ -106,15 +120,17 @@ IF "%COMMAND%" == "r" (
     git branch --sort=-committerdate > "%buff%"
     CALL :SelectOneFromList "Select branch for rebase in current: "
     IF NOT [!ONEFORMLIST!] == [] (
-        git pull --rebase !ONEFORMLIST:~2!
+        git pull --rebase origin !ONEFORMLIST:~2!
     )
 )
-IF "%COMMAND%" == "r+" (
-    git branch -r > "%buff%"
-    CALL :SelectOneFromList "Select remote branch for rebase in current: "
-    IF NOT [!ONEFORMLIST!] == [] (
-        git pull --rebase !ONEFORMLIST:~2!
-    )
+IF "%COMMAND%" == "rc" (
+    git rebase --continue
+)
+IF "%COMMAND%" == "rs" (
+    git rebase --skip
+)
+IF "%COMMAND%" == "ra" (
+    git rebase --abort
 )
 
 rem -----------------------------------------------------
@@ -244,7 +260,7 @@ IF "%COMMAND%" == "mt" (
 
 rem -----------------------------------------------------
 
-IF "%COMMAND%" == "r" (
+IF "%COMMAND%" == "hr" (
     ECHO Reset:
     git reset --hard HEAD
 )
@@ -261,6 +277,7 @@ rem -----------------------------------------------------
 IF "%COMMAND%" == "h" (
     ECHO Help:
     ECHO s   - show status
+    ECHO a   - add unstorage files
     ECHO c   - commit all changed files
     ECHO p   - push to current branch
     ECHO pf  - push force to current branch
@@ -272,7 +289,9 @@ IF "%COMMAND%" == "h" (
     ECHO m   - merge in current branch
     ECHO m+  - merge remote in current branch
     ECHO r   - rebase in current branch
-    ECHO r+  - rebase remote in current branch
+    ECHO rc  - rebase continue
+    ECHO rs  - rebase skip
+    ECHO ra  - rebase abort
     ECHO ------------------------
     ECHO b   - branch list
     ECHO b+  - remote branch list
@@ -295,7 +314,7 @@ IF "%COMMAND%" == "h" (
     ECHO mt  - remove tag from old commit and add to current
     ECHO ------------------------
     ECHO cf  - checkout file
-    ECHO r   - reset branch
+    ECHO hr  - hard reset branch
     ECHO ------------------------
     ECHO h   - help
     ECHO e   - exit
