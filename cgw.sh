@@ -159,6 +159,10 @@ do
     then
         echo "Push:"
         git push origin $CURRENT_BRANCH
+    elif [ "$COMMAND" = "pf" ];
+    then
+        echo "Push force:"
+        git push -f origin $CURRENT_BRANCH
     elif [ "$COMMAND" = "cp" ];
     then
         echo "Files add to commit:"
@@ -273,11 +277,11 @@ do
         SelectOneFromList "Select commit for new branch: "
         if [ "$ONEFORMLIST" != "" ];
         then
-            echo "Add branch from commit ${ONEFORMLIST:0:8}"
+            echo "Add branch from commit ${ONEFORMLIST:0:7}"
             read -e -p "Branch name (e - cancel): " BRANCH
             if [ "$BRANCH" != "e" ];
             then
-                git checkout -b  "$BRANCH" "${ONEFORMLIST:0:8}"
+                git checkout -b  "$BRANCH" "${ONEFORMLIST:0:7}"
             fi
         fi
     elif [ "$COMMAND" = "bh" ];
@@ -295,7 +299,7 @@ do
         SelectOneFromList "Select commit for revert: "
         if [ "$ONEFORMLIST" != "" ];
         then
-            git revert "${ONEFORMLIST:0:8}" --no-edit
+            git revert "${ONEFORMLIST:0:7}" --no-edit
             echo
         fi
     # --------------------------------------------
@@ -353,6 +357,7 @@ do
         echo "s   - show status"
         echo "c   - commit all changed files"
         echo "p   - push to current branch"
+        echo "pf  - push force to current branch"
         echo "cp  - commit all changed fales and push to current branch"
         echo "pl  - pull form current branch"
         echo "f   - fetch"
@@ -370,7 +375,7 @@ do
         echo "ab  - add branch from current branch"
         echo "bfc - branch from commit"
         echo "bh  - current branch history"
-        echo "bp  - branch remote prune origin"
+        echo "bp  - remote branch prune"
         echo "------------------------"
         echo "rc  - revert commit"
         echo "------------------------"

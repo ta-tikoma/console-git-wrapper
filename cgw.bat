@@ -49,6 +49,10 @@ IF "%COMMAND%" == "p" (
     ECHO Push:
     git push origin !CURRENT_BRANCH!
 )
+IF "%COMMAND%" == "pf" (
+    ECHO Push force:
+    git push -f origin !CURRENT_BRANCH!
+)
 IF "%COMMAND%" == "cp" (
     ECHO Files add to commit:
     FOR /f "delims=" %%L in ('git status -s') do (
@@ -242,6 +246,7 @@ IF "%COMMAND%" == "h" (
     ECHO s   - show status
     ECHO c   - commit all changed files
     ECHO p   - push to current branch
+    ECHO pf  - push force to current branch
     ECHO cp  - commit all changed fales and push to current branch
     ECHO pl  - pull form current branch
     ECHO f   - fetch
@@ -259,7 +264,7 @@ IF "%COMMAND%" == "h" (
     ECHO ab  - add branch from current branch
     ECHO bfc - branch from commit
     ECHO bh  - current branch history
-    ECHO bp  - branch remote prune origin
+    ECHO bp  - remote branch prune
     ECHO ------------------------
     ECHO rc  - revert commit
     ECHO ------------------------
