@@ -221,6 +221,18 @@ IF "%COMMAND%" == "rc" (
     )
 )
 
+IF "%COMMAND%" == "chc" (
+    git branch --sort=-committerdate > "%buff%"
+    CALL :SelectOneFromList "Select branch for search commit to cherry-pick: "
+    IF NOT [!ONEFORMLIST!] == [] (
+        git log !ONEFORMLIST:~2! --pretty=format:"%%h | %%<(30)%%an | %%<(30)%%ar | %%s" > "%buff%"
+        CALL :SelectOneFromList "Select commit for cherry-pick: "
+        IF NOT [!ONEFORMLIST!] == [] (
+            git cherry-pick !ONEFORMLIST:~0,8!
+        )
+    )
+)
+
 rem -----------------------------------------------------
 
 IF "%COMMAND%" == "t" (
@@ -306,6 +318,7 @@ IF "%COMMAND%" == "h" (
     ECHO bp  - remote branch prune
     ECHO ------------------------
     ECHO rc  - revert commit
+    ECHO chc - cherry-pick commit
     ECHO ------------------------
     ECHO t   - tag list
     ECHO ftf - fetch tag force

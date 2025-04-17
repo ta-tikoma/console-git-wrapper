@@ -325,6 +325,20 @@ do
             git revert "${ONEFORMLIST:0:7}" --no-edit
             echo
         fi
+    elif [ "$COMMAND" = "chc" ];
+    then
+        git branch --sort=-committerdate > "$buff"
+        SelectOneFromList "Select branch for search commit to cherry-pick: "
+        if [ "$ONEFORMLIST" != "" ];
+        then
+            git log "${ONEFORMLIST:2}" --pretty=format:"%h | %<(30)%an | %<(30)%ar | %s" > "$buff"
+            SelectOneFromList "Select commit for cherry-pick: "
+            if [ "$ONEFORMLIST" != "" ];
+            then
+                git cherry-pick "${ONEFORMLIST:0:7}" --no-edit
+                echo
+            fi
+        fi
     # --------------------------------------------
     elif [ "$COMMAND" = "t" ];
     then
@@ -407,6 +421,7 @@ do
         echo "bp  - remote branch prune"
         echo "------------------------"
         echo "rc  - revert commit"
+        echo "chc - cherry-pick commit"
         echo "------------------------"
         echo "t   - tag list"
         echo "ftf - fetch tag force"
